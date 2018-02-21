@@ -1,0 +1,17 @@
+{
+    "presets": [
+      "react",
+      [
+        "env",
+        {
+          "modules": false,
+          "targets": {
+            "browsers": ["last 2 Chrome versions"]
+          }
+        }
+      ]
+    ],
+    "plugins": [
+      "babel-plugin-transform-class-properties"
+    ]
+  }
