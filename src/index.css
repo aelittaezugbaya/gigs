@@ -1,0 +1,21 @@
+#map{
+    position: absolute;
+    top:0; bottom:0;
+    width: 100%;
+    height: 100%;
+}
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+.container-fluid {
+    height:100%;
+    padding-left: 0;
+}
+.row{
+    height:100%
+}
+#root{
+    height: 100%
+}

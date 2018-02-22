@@ -17,7 +17,7 @@ const commonConfig= {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      title: 'Shopping List',
+      title: 'Gigs',
       template: path.join(PATHS.src, 'template.html')
     }),
   ],
