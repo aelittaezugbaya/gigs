@@ -12,12 +12,22 @@ export default class Map extends React.Component{
         const map = new mapboxgl.Map({
             container: 'map',
             style: 'mapbox://styles/mapbox/streets-v10',
-            center: [-74.50, 40], // starting position
-            zoom: 9 // starting zoom
+            center: [ 24.9384, 60.1699], // starting position
+            zoom: 13 // starting zoom
         });
-        
-        // Add zoom and rotation controls to the map.
+
+         // Add zoom and rotation controls to the map.
         map.addControl(new mapboxgl.NavigationControl());
+        map.addControl(new mapboxgl.GeolocateControl({
+            positionOptions: {
+                enableHighAccuracy: true
+            },
+            trackUserLocation: true
+        }));
+        navigator.geolocation.getCurrentPosition((position) => {
+            const coords = position.coords;
+            map.flyTo( {center: [coords.longitude,coords.latitude]});
+        });
     }
     render(){
         return(
