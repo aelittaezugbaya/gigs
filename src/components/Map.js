@@ -22,11 +22,15 @@ export default class Map extends React.Component{
             positionOptions: {
                 enableHighAccuracy: true
             },
+            fitBoundsOptions:{
+                maxZoom:14
+            },
             trackUserLocation: true
         }));
         navigator.geolocation.getCurrentPosition((position) => {
             const coords = position.coords;
-            map.flyTo( {center: [coords.longitude,coords.latitude]});
+            // map.flyTo( {center: [coords.longitude,coords.latitude]});
+            map.setCenter([coords.longitude,coords.latitude])
         });
     }
     render(){

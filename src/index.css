@@ -19,3 +19,11 @@ html, body {
 #root{
     height: 100%
 }
+
+#side-menu{
+    padding-left: 15px;
+}
+
+h5{
+    padding-top: 10px;
+}
