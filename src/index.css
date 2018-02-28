@@ -27,3 +27,16 @@ html, body {
 h5{
     padding-top: 10px;
 }
+
+.mapboxgl-popup {
+    max-width: 400px;
+    font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+}
+
+.logout{
+    width: 250px;
+    margin-left: 7%;
+    position: absolute;
+    bottom: 5%;
+    
+}
