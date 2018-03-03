@@ -1,6 +1,7 @@
 import React from 'react';
 import Map from './Map';
-import SideMenu from './SideMenu'
+import SideMenu from './SideMenu';
+import Login from './Login';
 import { Row, Col, Grid, Button } from 'react-bootstrap';
 
 export default class App extends React.Component{
@@ -77,17 +78,18 @@ export default class App extends React.Component{
     }
     render(){
         return(
-            <Grid fluid>
-                <Row>
-                    <Col md={9}>
-                        <Map/>
-                    </Col>
-                    <Col md={3}>
-                        <SideMenu/>
-                        <Button onClick={this.logIn}> Log in</Button>
-                    </Col>
-                </Row>
-            </Grid>
+            <Login/>
+            // <Grid fluid>
+            //     <Row>
+            //         <Col md={9}>
+            //             <Map/>
+            //         </Col>
+            //         <Col md={3}>
+            //             <SideMenu/>
+            //             <Button onClick={this.logIn}> Log in</Button>
+            //         </Col>
+            //     </Row>
+            // </Grid>
         );
     }
 }

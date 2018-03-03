@@ -28,6 +28,15 @@ const commonConfig= {
         use: ["style-loader", "css-loader"]
       },
       {
+        test: /\.(jpg|png|svg)$/,
+        use: {
+          loader: "file-loader",
+          options: {
+            name: "[path][name].[hash].[ext]",
+          },
+        },
+      },      
+      {
         test: /\.jsx?$/,
         exclude:/node_modules/,
         use: "babel-loader",
