@@ -89,7 +89,9 @@ export default class SideMenu extends React.Component{
                 dataSource={data}
                 renderItem={item => (<List.Item>{item}</List.Item>)}
                 />
-                <Button type="danger" className='logout' size='large' onClick={this.logOut}>Log out</Button>
+                <footer className='text-center'>
+                    <Button type="danger" className='logout ' size='large' onClick={this.logOut}>Log out</Button>
+                </footer>
           </div>
         )
     }

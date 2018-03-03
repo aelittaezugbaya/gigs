@@ -22,6 +22,7 @@ html, body {
 
 #side-menu{
     padding-left: 15px;
+    height: 100%;
 }
 
 h5{
@@ -39,10 +40,15 @@ h5{
 
 .logout{
     width: 250px;
-    margin-left: 7%;
+    position: relative;   
+}
+
+footer{
+    height: 100px; 
+    width:100%;
     position: absolute;
-    bottom: 5%;
-    
+    left: 0;
+    bottom: 0; 
 }
 
 .login100-more {
