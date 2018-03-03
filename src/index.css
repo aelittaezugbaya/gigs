@@ -43,14 +43,6 @@ h5{
     position: relative;   
 }
 
-footer{
-    height: 100px; 
-    width:100%;
-    position: absolute;
-    left: 0;
-    bottom: 0; 
-}
-
 .login100-more {
     height:100%;
     width: 100%;
