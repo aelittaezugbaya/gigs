@@ -19,6 +19,7 @@ export default class App extends React.Component{
             this.state={
                 jwt: window.localStorage.accessToken
             }
+            window.location='http://localhost:8080/';
         }
         this.state={
             jwt: window.localStorage.accessToken ? window.localStorage.accessToken: ''
@@ -52,7 +53,6 @@ export default class App extends React.Component{
                         </Col>
                         <Col md={3}>
                             <SideMenu/>
-                            <Button onClick={this.logIn}> Log in</Button>
                         </Col>
                     </Row>
                 </Grid>

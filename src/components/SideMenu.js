@@ -18,6 +18,16 @@ const data = [
 
 export default class SideMenu extends React.Component{
 
+    constructor(props){
+        super(props);
+        this.logOut = this.logOut.bind(this);
+    }
+
+    logOut(){
+        delete window.localStorage.accessToken;
+        window.location='http://localhost:8080/';
+    }
+
     
     render(){
         const marks = {
@@ -79,7 +89,7 @@ export default class SideMenu extends React.Component{
                 dataSource={data}
                 renderItem={item => (<List.Item>{item}</List.Item>)}
                 />
-                <Button type="danger" className='logout' size='large'>Log out</Button>
+                <Button type="danger" className='logout' size='large' onClick={this.logOut}>Log out</Button>
           </div>
         )
     }
