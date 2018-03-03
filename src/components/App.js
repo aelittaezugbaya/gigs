@@ -35,11 +35,6 @@ export default class App extends React.Component{
         }
         return hashParams;
       }
-
-    componentDidMount(){
-        
-    }
-
   
     render(){
         let {jwt}=this.state;
