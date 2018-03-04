@@ -5,6 +5,11 @@ import { Row, Col } from 'antd';
 export default class Map extends React.Component{
     constructor(props){
         super(props);
+        this.state = {
+            places:[]
+        }
+
+        this.renderMap = this.renderMap.bind(this)
     }
 
     componentDidMount(){
@@ -30,57 +35,49 @@ export default class Map extends React.Component{
         navigator.geolocation.getCurrentPosition((position) => {
             const coords = position.coords;
             // map.flyTo( {center: [coords.longitude,coords.latitude]});
+            this.findGigs(coords.latitude, coords.longitude, map)
             map.setCenter([coords.longitude,coords.latitude])
-        });
 
-        map.on('load', function () {
-            // Add a layer showing the places.
-            map.addLayer({
-                "id": "places",
-                "type": "symbol",
-                "source": {
-                    "type": "geojson",
-                    "data": {
-                        "type": "FeatureCollection",
-                        "features": [{
-                            "type": "Feature",
-                            "properties": {
-                                "description": "<strong>Muhsinah</strong><p>Jazz-influenced hip hop artist <a href=\"http://www.muhsinah.com\" target=\"_blank\" title=\"Opens in a new window\">Muhsinah</a> plays the <a href=\"http://www.blackcatdc.com\">Black Cat</a> (1811 14th Street NW) tonight with <a href=\"http://www.exitclov.com\" target=\"_blank\" title=\"Opens in a new window\">Exit Clov</a> and <a href=\"http://godsilla.bandcamp.com\" target=\"_blank\" title=\"Opens in a new window\">Gods’illa</a>. 9:00 p.m. $12.</p>",
-                                "icon": "music"
-                            },
-                            "geometry": {
-                                "type": "Point",
-                                "coordinates": [24.657520, 60.206954]
-                            }
-                        }, {
-                            "type": "Feature",
-                            "properties": {
-                                "description": "<strong>A Little Night Music</strong><p>The Arlington Players' production of Stephen Sondheim's  <a href=\"http://www.thearlingtonplayers.org/drupal-6.20/node/4661/show\" target=\"_blank\" title=\"Opens in a new window\"><em>A Little Night Music</em></a> comes to the Kogod Cradle at The Mead Center for American Theater (1101 6th Street SW) this weekend and next. 8:00 p.m.</p>",
-                                "icon": "music"
-                            },
-                            "geometry": {
-                                "type": "Point",
-                                "coordinates": [24.653660, 60.209550]
-                            }
-                        }, {
-                            "type": "Feature",
-                            "properties": {
-                                "description": "<strong>Truckeroo</strong><p><a href=\"http://www.truckeroodc.com/www/\" target=\"_blank\">Truckeroo</a> brings dozens of food trucks, live music, and games to half and M Street SE (across from Navy Yard Metro Station) today from 11:00 a.m. to 11:00 p.m.</p>",
-                                "icon": "music"
-                            },
-                            "geometry": {
-                                "type": "Point",
-                                "coordinates": [24.661168, 60.199008]
-                            }
-                        }]
-                    }
-                },
-                "layout": {
-                    "icon-image": "{icon}-15",
-                    "icon-allow-overlap": true
-                }
-            });
         });
+    }
+
+    putMarkers(map,events){
+        console.log('markers')
+        const gigs = [];
+        events.forEach(event => {
+            gigs.push({
+                "type": "Feature",
+                "properties": {
+                    "description": "<strong>"+event.title+"</strong><p>"+event.description+"</p><a href='"+event.url+"'target=\"_blank\" title=\"Opens in a new window\">Link to the event</a>",
+                    "icon": "music"
+                },
+                "geometry": {
+                    "type": "Point",
+                    "coordinates": [event.longitude,event.latitude]
+                }
+            })
+        })
+        console.log(gigs)
+        
+       
+            // Add a layer showing the places.
+        console.log(gigs)
+        map.addLayer({
+            "id": "places",
+            "type": "symbol",
+            "source": {
+                "type": "geojson",
+                "data": {
+                    "type": "FeatureCollection",
+                    "features": gigs
+                }
+            },
+            "layout": {
+                "icon-image": "{icon}-15",
+                "icon-allow-overlap": true
+            }
+        });
+       
         map.on('click', 'places', function (e) {
             var coordinates = e.features[0].geometry.coordinates.slice();
             var description = e.features[0].properties.description;
@@ -107,8 +104,27 @@ export default class Map extends React.Component{
         map.on('mouseleave', 'places', function () {
             map.getCanvas().style.cursor = '';
         });
+        
     }
+
+    findGigs(latitude, longitude, map){
+        window.fetch('http://api.eventful.com/json/events/search?app_key=vHdXThWsm6Xn9HPP&keuwords=pop&category=music&where='+encodeURIComponent(latitude)+','+encodeURIComponent(longitude)+'&within=5&date=Future', {
+            method: 'GET'
+        }).then((data) => data.json())
+        .then((data) => {
+            console.log(data)
+            this.putMarkers(map,data.events.event)
+        });
+    }
+
+    renderMap(){
+       
+       
+        
+    }
+
     render(){
+       
         return(
             <div id ='map'></div>
         );
