@@ -111,11 +111,13 @@ class Map extends React.Component{
     }
 
     findGigs(latitude, longitude, map){
-        window.fetch('http://api.eventful.com/json/events/search?app_key=vHdXThWsm6Xn9HPP&keuwords=pop&category=music&where='+encodeURIComponent(latitude)+','+encodeURIComponent(longitude)+'&within=5&date=Future', {
+        window.fetch('http://api.eventful.com/json/events/search?app_key=vHdXThWsm6Xn9HPP&keuwords=pop&category=music&where='+encodeURIComponent(latitude)+','+encodeURIComponent(longitude)+'&within=15&date=This Week&sort_order=date&page_size=90', {
             method: 'GET',
+    
             // mode: 'no-cors'
         }).then((data) => data.json())
         .then((data) => {
+            console.log(data)
             this.props.receiveGigs(data.events.event);
             this.putMarkers(map, data.events.event);
         });
