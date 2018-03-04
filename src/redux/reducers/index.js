@@ -1,7 +1,13 @@
 import actions from "../actions";
 
 const initialState = {
-  gigs: []
+  gigs: [],
+  settings: {
+    date: null,
+    range: 20,
+    city: null,
+    genres: [],
+  }
 };
 
 function gigsApp(state, action) {
@@ -19,6 +25,14 @@ function gigsApp(state, action) {
         }
       )
       break;
+    case actions.UPDATE_SETTINGS:
+      return {
+        ...state,
+        settings: {
+          ...state.settings,
+          ...action.payload,
+        }
+      }
     default:
   }
   // For now, don't handle any actions

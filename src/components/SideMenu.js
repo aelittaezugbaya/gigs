@@ -30,7 +30,11 @@ class SideMenu extends React.Component{
         window.location='http://localhost:8080/';
     }
 
-    
+    changeDate = (moment) => this.props.updateSettings({date: moment});
+    changeRange = (value) => this.props.updateSettings({range: value});
+    changeCity = (value) => this.props.updateSettings({city: value});
+    changeGenres = (values) => this.props.updateSettings({genres: values});
+
     render(){
         const marks = {
             0: '0 km',
@@ -54,8 +58,11 @@ class SideMenu extends React.Component{
 
         const children = [];
         for (let i = 0; i < 6; i++) {
-        children.push(<Option key={genre[i]}>{genre[i]}</Option>);
+          children.push(<Option key={genre[i]}>{genre[i]}</Option>);
         }
+
+        const { settings } = this.props;
+
         return(
             <div id='side-menu'>
                 <h3 style={{ marginBottom: 16 }}>List of gigs and Settings</h3>
@@ -66,26 +73,30 @@ class SideMenu extends React.Component{
                         </React.Fragment>
                     )} key="1">
                         <h5>Choose date</h5>
-                        <DatePicker/>
+                        <DatePicker onChange={this.changeDate} value={settings.date}/>
                         <h5>Area range</h5>
-                        <Slider marks={marks} defaultValue={20} max={250} tipFormatter={formatter}/>
-                        <h5>Change center(type another city or town)</h5>
+                        <Slider marks={marks} defaultValue={20} max={250} tipFormatter={formatter} onAfterChange={this.changeRange} defaultValue={settings.range}/>
+                        <h5>Change city</h5>
                         <AutoComplete
                             style={{ width: 300 }}
                             placeholder="input here"
+                            onChange={this.changeCity}
+                            value={settings.city}
                         />
                         <h5>Choose genres</h5>
                          <Select
                             mode="multiple"
                             style={{ width: '100%' }}
                             placeholder="Please select"
+                            onChange={this.changeGenres}
+                            value={settings.genres}
                         >
                             {children}
                         </Select>
-                        
+
                     </Panel>
                 </Collapse>
-                
+
                 <List
                 itemLayout="horizontal"
                 dataSource={this.props.gigs}
@@ -99,15 +110,15 @@ class SideMenu extends React.Component{
     }
 }
 
-const mapStateToProps = ({gigs}) => ({
-    gigs,
+const mapStateToProps = ({settings}) => ({
+    settings
   });
-  
+
   const mapDispatchToProps = (dispatch) => ({
-    receiveGigs: (gigs) => dispatch({
-      type: actions.RECEIVE_GIGS,
-      payload: gigs,
+    updateSettings: (setting) => dispatch({
+      type: actions.UPDATE_SETTINGS,
+      payload: setting
     })
   })
-  
+
   export default connect(mapStateToProps, mapDispatchToProps)(SideMenu);
