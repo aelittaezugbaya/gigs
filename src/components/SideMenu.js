@@ -1,5 +1,7 @@
 import React from 'react';
 import { List } from 'antd';
+import {connect} from 'react-redux';
+import actions from '../redux/actions';
 import { Collapse, Slider, AutoComplete, DatePicker, Select, Button} from 'antd';
 const Option = Select.Option;
 const Panel = Collapse.Panel;
@@ -16,7 +18,7 @@ const data = [
   'Truckero',
 ];
 
-export default class SideMenu extends React.Component{
+class SideMenu extends React.Component{
 
     constructor(props){
         super(props);
@@ -86,8 +88,8 @@ export default class SideMenu extends React.Component{
                 
                 <List
                 itemLayout="horizontal"
-                dataSource={data}
-                renderItem={item => (<List.Item>{item}</List.Item>)}
+                dataSource={this.props.gigs}
+                renderItem={item => (<List.Item><a href={item.url} target="_blank">{item.title} {item.start_time}</a></List.Item>)}
                 />
                 <footer className='text-center'>
                     <Button type="danger" className='logout ' size='large' onClick={this.logOut}>Log out</Button>
@@ -96,3 +98,16 @@ export default class SideMenu extends React.Component{
         )
     }
 }
+
+const mapStateToProps = ({gigs}) => ({
+    gigs,
+  });
+  
+  const mapDispatchToProps = (dispatch) => ({
+    receiveGigs: (gigs) => dispatch({
+      type: actions.RECEIVE_GIGS,
+      payload: gigs,
+    })
+  })
+  
+  export default connect(mapStateToProps, mapDispatchToProps)(SideMenu);
