@@ -1,8 +1,11 @@
 import React from 'react';
+import {connect} from 'react-redux';
+import actions from '../redux/actions';
 import mapboxgl from 'mapbox-gl/dist/mapbox-gl.js';
 import { Row, Col } from 'antd';
 
-export default class Map extends React.Component{
+
+class Map extends React.Component{
     constructor(props){
         super(props);
         this.state = {
@@ -35,8 +38,8 @@ export default class Map extends React.Component{
         navigator.geolocation.getCurrentPosition((position) => {
             const coords = position.coords;
             // map.flyTo( {center: [coords.longitude,coords.latitude]});
-            this.findGigs(coords.latitude, coords.longitude, map)
             map.setCenter([coords.longitude,coords.latitude])
+            this.findGigs(coords.latitude, coords.longitude, map)
 
         });
     }
@@ -58,8 +61,8 @@ export default class Map extends React.Component{
             })
         })
         console.log(gigs)
-        
-       
+
+
             // Add a layer showing the places.
         console.log(gigs)
         map.addLayer({
@@ -77,56 +80,70 @@ export default class Map extends React.Component{
                 "icon-allow-overlap": true
             }
         });
-       
+
         map.on('click', 'places', function (e) {
             var coordinates = e.features[0].geometry.coordinates.slice();
             var description = e.features[0].properties.description;
-    
+
             // Ensure that if the map is zoomed out such that multiple
             // copies of the feature are visible, the popup appears
             // over the copy being pointed to.
             while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
                 coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
             }
-    
+
             new mapboxgl.Popup()
                 .setLngLat(coordinates)
                 .setHTML(description)
                 .addTo(map);
         });
-    
+
         // Change the cursor to a pointer when the mouse is over the places layer.
         map.on('mouseenter', 'places', function () {
             map.getCanvas().style.cursor = 'pointer';
         });
-    
+
         // Change it back to a pointer when it leaves.
         map.on('mouseleave', 'places', function () {
             map.getCanvas().style.cursor = '';
         });
-        
+
     }
 
     findGigs(latitude, longitude, map){
         window.fetch('http://api.eventful.com/json/events/search?app_key=vHdXThWsm6Xn9HPP&keuwords=pop&category=music&where='+encodeURIComponent(latitude)+','+encodeURIComponent(longitude)+'&within=5&date=Future', {
-            method: 'GET'
+            method: 'GET',
+            // mode: 'no-cors'
         }).then((data) => data.json())
         .then((data) => {
-            console.log(data)
-            this.putMarkers(map,data.events.event)
+            this.props.receiveGigs(data.events.event);
+            this.putMarkers(map, data.events.event);
         });
     }
 
     renderMap(){
-       
-       
-        
+
+
+
     }
 
     render(){
-       
+
         return(
             <div id ='map'></div>
         );
     }
 }
+
+const mapStateToProps = ({gigs}) => ({
+  gigs,
+});
+
+const mapDispatchToProps = (dispatch) => ({
+  receiveGigs: (gigs) => dispatch({
+    type: actions.RECEIVE_GIGS,
+    payload: gigs,
+  })
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(Map);
