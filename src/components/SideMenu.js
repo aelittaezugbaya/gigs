@@ -115,8 +115,8 @@ class SideMenu extends React.Component{
     }
 }
 
-const mapStateToProps = ({settings}) => ({
-    settings
+const mapStateToProps = ({gigs,settings}) => ({
+    settings,gigs
   });
 
   const mapDispatchToProps = (dispatch) => ({

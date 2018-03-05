@@ -123,7 +123,7 @@ class Map extends React.Component{
     findGigs(latitude, longitude, map){
 
 
-        window.fetch('http://api.eventful.com/json/events/search?app_key=vHdXThWsm6Xn9HPP&keuwords=pop&category=music&where='+encodeURIComponent(latitude)+','+encodeURIComponent(longitude)+'&within=15&date=This Week&sort_order=date&page_size=90', {
+        window.fetch('http://api.eventful.com/json/events/search?app_key=vHdXThWsm6Xn9HPP&keuwords=pop&category=music&where='+encodeURIComponent(latitude)+','+encodeURIComponent(longitude)+'&within=15&date=Future&sort_order=date&page_size=20', {
             method: 'GET',
     
             // mode: 'no-cors'
@@ -145,6 +145,7 @@ class Map extends React.Component{
             .then(data => {
                 console.log(data.features[0].center);
                 this.state.map.setCenter(data.features[0].center);
+                this.findGigs(data.features[0].center[1],data.features[0].center[0],this.state.map)
             });
         }
     }
