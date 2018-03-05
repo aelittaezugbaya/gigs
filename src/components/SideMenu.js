@@ -2,15 +2,15 @@ import React from 'react';
 import { List } from 'antd';
 import {connect} from 'react-redux';
 import actions from '../redux/actions';
-import { Collapse, Slider, AutoComplete, DatePicker, Select, Button} from 'antd';
+import { Collapse, Slider, Input, DatePicker, Select, Button} from 'antd';
 const Option = Select.Option;
 const Panel = Collapse.Panel;
 import 'antd/lib/list/style/css'
 import 'antd/lib/collapse/style/css'
 import 'antd/lib/slider/style/css'
-import 'antd/lib/auto-complete/style/css'
+import 'antd/lib/input/style/css'
 import 'antd/lib/date-picker/style/css'
-
+import cities from 'cities.json'
 
 const data = [
   'Jazz-influenced hip hop artist',
@@ -22,6 +22,11 @@ class SideMenu extends React.Component{
 
     constructor(props){
         super(props);
+        const arrayOfCitirs=[];
+        console.log(arrayOfCitirs);
+        this.state = {
+            cities: arrayOfCitirs
+        }
         this.logOut = this.logOut.bind(this);
     }
 
@@ -77,11 +82,11 @@ class SideMenu extends React.Component{
                         <h5>Area range</h5>
                         <Slider marks={marks} defaultValue={20} max={250} tipFormatter={formatter} onAfterChange={this.changeRange} defaultValue={settings.range}/>
                         <h5>Change city</h5>
-                        <AutoComplete
+                        <Input.Search
                             style={{ width: 300 }}
                             placeholder="input here"
-                            onChange={this.changeCity}
-                            value={settings.city}
+                            onSearch={value => this.changeCity(value)}
+                            enterButton
                         />
                         <h5>Choose genres</h5>
                          <Select
