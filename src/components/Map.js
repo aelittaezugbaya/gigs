@@ -3,18 +3,26 @@ import {connect} from 'react-redux';
 import actions from '../redux/actions';
 import mapboxgl from 'mapbox-gl/dist/mapbox-gl.js';
 import { Row, Col } from 'antd';
+import 'lodash';
+import cities from 'cities.json';
 
 
 class Map extends React.Component{
     constructor(props){
         super(props);
         this.state = {
-            places:[]
+            
         }
-
-        this.renderMap = this.renderMap.bind(this)
+        
+        this.findGigs = this.findGigs.bind(this)
     }
-
+    
+    componentWillReceiveProps(nextProps){
+        console.log(nextProps)
+        if(_.isEqual(this.props.settings, nextProps.settings) == false){
+            this.findGigsBySettings(nextProps.settings)
+        }
+    }
     componentDidMount(){
         mapboxgl.accessToken = 'pk.eyJ1IjoiYWVsaXR0YWUiLCJhIjoiY2pkeWlsODg0MHp4dTMzbzZncTI0dzBpdCJ9.6YIUNwH0qV7HZqxkmel2DQ';
         const map = new mapboxgl.Map({
@@ -39,14 +47,22 @@ class Map extends React.Component{
             const coords = position.coords;
             // map.flyTo( {center: [coords.longitude,coords.latitude]});
             map.setCenter([coords.longitude,coords.latitude])
-            this.findGigs(coords.latitude, coords.longitude, map)
-
+            //this.findGigs(coords.latitude, coords.longitude, map)
+            this.setState({
+                map: map,
+                latitude: coords.latitude,
+                longitude: coords.longitude
+            })
+            this.findGigs(this.state.latitude, this.state.longitude, this.state.map)
         });
     }
 
     putMarkers(map,events){
-        console.log('markers')
         const gigs = [];
+        if(map.getLayer("places")){
+            map.removeLayer("places");
+            map.removeSource('source');
+        }
         events.forEach(event => {
             gigs.push({
                 "type": "Feature",
@@ -60,21 +76,18 @@ class Map extends React.Component{
                 }
             })
         })
-        console.log(gigs)
 
-
-            // Add a layer showing the places.
-        console.log(gigs)
+        map.addSource('source',{
+            "type": "geojson",
+            "data": {
+                "type": "FeatureCollection",
+                "features": gigs
+            }
+        })
         map.addLayer({
             "id": "places",
             "type": "symbol",
-            "source": {
-                "type": "geojson",
-                "data": {
-                    "type": "FeatureCollection",
-                    "features": gigs
-                }
-            },
+            "source": 'source',
             "layout": {
                 "icon-image": "{icon}-15",
                 "icon-allow-overlap": true
@@ -84,10 +97,7 @@ class Map extends React.Component{
         map.on('click', 'places', function (e) {
             var coordinates = e.features[0].geometry.coordinates.slice();
             var description = e.features[0].properties.description;
-
-            // Ensure that if the map is zoomed out such that multiple
-            // copies of the feature are visible, the popup appears
-            // over the copy being pointed to.
+            
             while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
                 coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
             }
@@ -111,6 +121,8 @@ class Map extends React.Component{
     }
 
     findGigs(latitude, longitude, map){
+
+
         window.fetch('http://api.eventful.com/json/events/search?app_key=vHdXThWsm6Xn9HPP&keuwords=pop&category=music&where='+encodeURIComponent(latitude)+','+encodeURIComponent(longitude)+'&within=15&date=This Week&sort_order=date&page_size=90', {
             method: 'GET',
     
@@ -123,22 +135,35 @@ class Map extends React.Component{
         });
     }
 
+    findGigsBySettings(settings){
+        console.log('kek')
+        console.log(settings)
+        if(settings.city){
+            window.fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${settings.city}.json?access_token=pk.eyJ1IjoiYWVsaXR0YWUiLCJhIjoiY2pkdzF3bWN6MGZudjJ2b2hlN2x0ZWM2OCJ9.lM3nZt9piPiGYrpDiGAOHw&autocomplete=true&limit=1`,{
+                method:'GET'
+            }).then(data => data.json())
+            .then(data => {
+                console.log(data.features[0].center);
+                this.state.map.setCenter(data.features[0].center);
+            });
+        }
+    }
+
     renderMap(){
 
 
 
     }
 
-    render(){
-
+    render(){  
         return(
             <div id ='map'></div>
         );
     }
 }
 
-const mapStateToProps = ({gigs}) => ({
-  gigs,
+const mapStateToProps = ({gigs,settings}) => ({
+  gigs,settings
 });
 
 const mapDispatchToProps = (dispatch) => ({
