@@ -25,7 +25,7 @@ export default class Login extends React.Component{
         const state = this.generateRandomString(16);
         const stateKey = 'spotify_auth_state';
         localStorage.setItem(stateKey1, state);
-        const scope = 'user-read-private user-read-email';
+        const scope = 'user-read-private user-read-email user-top-read';
         let url = 'https://accounts.spotify.com/authorize';
         url += '?response_type=token';
         url += '&client_id=' + encodeURIComponent(client_id);

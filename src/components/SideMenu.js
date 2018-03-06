@@ -1,14 +1,18 @@
 import React from 'react';
+import moment from 'moment';
 import { List } from 'antd';
 import {connect} from 'react-redux';
 import actions from '../redux/actions';
 import { Collapse, Slider, Input, DatePicker, Select, Button} from 'antd';
 const Option = Select.Option;
+const RangePicker =DatePicker.RangePicker;
 const Panel = Collapse.Panel;
 import 'antd/lib/list/style/css'
 import 'antd/lib/collapse/style/css'
 import 'antd/lib/slider/style/css'
 import 'antd/lib/input/style/css'
+// import 'antd/lib/date-picker/RangePicker'
+// import 'antd/lib/date-picker/RangePicker'
 import 'antd/lib/date-picker/style/css'
 import cities from 'cities.json'
 
@@ -17,6 +21,8 @@ const data = [
   'A Little Night Music.',
   'Truckero',
 ];
+
+const dateFormat = 'YYYY/MM/DD';
 
 class SideMenu extends React.Component{
 
@@ -34,7 +40,11 @@ class SideMenu extends React.Component{
         window.location='http://localhost:8080/';
     }
 
-    changeDate = (moment) => this.props.updateSettings({date: moment});
+    changeDate = (moment) => {
+        const from = moment[0].format('YYYYMMDD00');
+        const to = moment[1].format('YYYYMMDD00')
+        const range = from+'-'+to;
+        this.props.updateSettings({date: range})};
     changeRange = (value) => this.props.updateSettings({range: value});
     changeCity = (value) => this.props.updateSettings({city: value});
     changeGenres = (values,Option) => {
@@ -81,7 +91,11 @@ class SideMenu extends React.Component{
                         </React.Fragment>
                     )} key="1">
                         <h5>Choose date</h5>
-                        <DatePicker onChange={this.changeDate} value={settings.date}/>
+                        {/* <DatePicker onChange={this.changeDate} value={settings.date}/> */}
+                        <RangePicker
+                            onChange={this.changeDate}
+                            format={dateFormat}
+                        />
                         <h5>Area range</h5>
                         <Slider marks={marks} defaultValue={20} max={250} tipFormatter={formatter} onAfterChange={this.changeRange} defaultValue={settings.range}/>
                         <h5>Change city</h5>
