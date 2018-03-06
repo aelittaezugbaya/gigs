@@ -4,8 +4,8 @@ const initialState = {
   gigs: [],
   settings: {
     date: null,
-    range: 20,
-    city: null,
+    range: 250,
+    city: 'Helsinki',
     genres: [],
   }
 };
