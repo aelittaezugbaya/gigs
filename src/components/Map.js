@@ -11,7 +11,9 @@ class Map extends React.Component{
     constructor(props){
         super(props);
         this.state = {
-            settings: this.props.settings
+            settings: this.props.settings,
+            gigs:[],
+            artists:[]
         }
         
         this.findGigs = this.findGigs.bind(this)
@@ -21,7 +23,8 @@ class Map extends React.Component{
        
         if(_.isEqual(this.props.settings, nextProps.settings) == false){
             this.props=nextProps;
-            this.findGigsBySettings(nextProps.settings)
+            this.props.receiveGigs([]);
+            this.findGigsBySettings(nextProps.settings);
         }
     }
     componentDidMount(){
@@ -54,7 +57,105 @@ class Map extends React.Component{
                 latitude: coords.latitude,
                 longitude: coords.longitude
             })
-            this.findGigs(this.state.latitude, this.state.longitude, this.state.map)
+            //this.findGigs(this.state.latitude, this.state.longitude, this.state.map)
+            this.getFavouriteArtists();
+        });
+    }
+
+    getArtistEvent(name){
+        const origin = 'https://cors-anywhere.herokuapp.com/';
+        let url = 'http://api.eventful.com/json/events/search?app_key=vHdXThWsm6Xn9HPP&';
+        url+='&category=music&page_size=100';
+        url+='&keywords=title:'+encodeURIComponent(name);
+        url+='&sort_order=date&page_size=20';
+        url+='&where='+encodeURIComponent(this.state.latitude)+','+encodeURIComponent(this.state.longitude);
+        // url+='&location='+encodeURIComponent(this.props.settings.city);
+        url+='&within='+encodeURIComponent(this.props.settings.range)+'&units=km';
+        window.fetch(origin+url,{
+            method: 'GET'
+        }).then(data=>data.json())
+        .then(data=>{
+            console.log(data);
+            const sortedByName=[];
+            if(data.events){
+                data.events.event.map(event=>{
+                    if(event.performers !=null){
+                        if(event.performers.performer.name){
+                            if(event.performers.performer.name.toUpperCase() == name.toUpperCase()){
+                                    sortedByName.push(event);
+                                }
+                        }else{
+                            console.log(event.performers.performer)
+                            event.performers.performer.map(music => {
+                                if(music.name.toUpperCase() == name.toUpperCase()){
+                                    //console.log(music)
+                                    sortedByName.push(event);
+
+                                }
+                            })
+                        }
+                    }
+                })
+            }
+            console.log('sorted');
+            console.log(sortedByName.length)
+            if(sortedByName.length >0){
+                this.props.receiveGigs(this.props.gigs.concat(sortedByName));
+                this.putMarkers(this.state.map,this.props.gigs)
+                console.log(this.props.gigs);
+            }
+            
+        })
+    }
+
+    getRecommendatedArtists(arrayOfArtists){
+        let string='';
+            for(let i = 0; i<5;i++){
+                string+= arrayOfArtists[i].id+','
+            }
+            console.log(string)
+            window.fetch(`https://api.spotify.com/v1/recommendations?limit=100&seed_artists=`+string,{
+                headers:{
+                    Authorization: 'Bearer '+window.localStorage.accessToken
+                }
+            }).then(data => data.json())
+            .then(data=>{
+                const recommendedArtists=[];
+                data.tracks.map(track=>{
+                    if(!recommendedArtists.includes(track.artists[0].name) && !this.state.artists.includes(track.artists[0].name)){
+                        recommendedArtists.push(track.artists[0].name)
+                    }
+                    
+                })
+                this.setState({
+                    artists: this.state.artists.concat(recommendedArtists),
+                })
+                console.log(this.state.artists)
+                for(const artist of recommendedArtists){
+                    this.getArtistEvent(artist);
+                }
+            })
+    }
+
+    getFavouriteArtists(){
+        window.fetch('https://api.spotify.com/v1/me/top/artists',{
+            method:'GET',
+            headers:{
+                Authorization: 'Bearer '+window.localStorage.accessToken
+            }
+        }).then(data => data.json())
+        .then(data =>{
+            const artists=[];
+            data.items.map(artist => artists.push({id:artist.id, name: artist.name, genres: artist.genres}))
+            console.log(artists)
+            for(let i =0;i<20;i+=5){
+                const group=[];
+                for(let j=i; j<i+5; j++){
+                    group.push(artists[j])
+                }
+                this.getRecommendatedArtists(group);
+            }
+            
         });
     }
 
@@ -149,7 +250,13 @@ class Map extends React.Component{
             }).then(data => data.json())
             .then(data => {
                 this.state.map.setCenter(data.features[0].center);
-                this.findGigs(data.features[0].center[1],data.features[0].center[0],this.state.map)
+                this.setState({
+                    longitude:data.features[0].center[0],
+                    latitude:data.features[0].center[1]
+                })
+                for(const artist of this.state.artists){
+                    this.getArtistEvent(artist);
+                }
             });
         } else {
             this.findGigs(this.state.latitude,this.state.longitude, this.state.map)
