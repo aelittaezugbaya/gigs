@@ -11,15 +11,16 @@ class Map extends React.Component{
     constructor(props){
         super(props);
         this.state = {
-            
+            settings: this.props.settings
         }
         
         this.findGigs = this.findGigs.bind(this)
     }
     
     componentWillReceiveProps(nextProps){
-        console.log(nextProps)
+       
         if(_.isEqual(this.props.settings, nextProps.settings) == false){
+            this.props=nextProps;
             this.findGigsBySettings(nextProps.settings)
         }
     }
@@ -121,32 +122,37 @@ class Map extends React.Component{
     }
 
     findGigs(latitude, longitude, map){
-
-
-        window.fetch('http://api.eventful.com/json/events/search?app_key=vHdXThWsm6Xn9HPP&keuwords=pop&category=music&where='+encodeURIComponent(latitude)+','+encodeURIComponent(longitude)+'&within=15&date=Future&sort_order=date&page_size=20', {
+        let url = 'http://api.eventful.com/json/events/search?app_key=vHdXThWsm6Xn9HPP&';
+        url+='&where='+encodeURIComponent(latitude)+','+encodeURIComponent(longitude);
+        url+='&category=music';
+        url+='&within='+encodeURIComponent(this.props.settings.range)+'&units=km';
+        url+='&sort_order=date&page_size=20&date=Future';
+        console.log(this.props.settings)
+        for(const genre of this.props.settings.genres){
+            console.log(genre)
+            url+='&keywords='+encodeURIComponent(genre);
+        }
+        window.fetch(url, {
             method: 'GET',
-    
-            // mode: 'no-cors'
         }).then((data) => data.json())
         .then((data) => {
-            console.log(data)
             this.props.receiveGigs(data.events.event);
             this.putMarkers(map, data.events.event);
         });
     }
 
     findGigsBySettings(settings){
-        console.log('kek')
-        console.log(settings)
+        
         if(settings.city){
             window.fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${settings.city}.json?access_token=pk.eyJ1IjoiYWVsaXR0YWUiLCJhIjoiY2pkdzF3bWN6MGZudjJ2b2hlN2x0ZWM2OCJ9.lM3nZt9piPiGYrpDiGAOHw&autocomplete=true&limit=1`,{
                 method:'GET'
             }).then(data => data.json())
             .then(data => {
-                console.log(data.features[0].center);
                 this.state.map.setCenter(data.features[0].center);
                 this.findGigs(data.features[0].center[1],data.features[0].center[0],this.state.map)
             });
+        } else {
+            this.findGigs(this.state.latitude,this.state.longitude, this.state.map)
         }
     }
 
