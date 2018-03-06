@@ -23,7 +23,6 @@ class SideMenu extends React.Component{
     constructor(props){
         super(props);
         const arrayOfCitirs=[];
-        console.log(arrayOfCitirs);
         this.state = {
             cities: arrayOfCitirs
         }
@@ -38,7 +37,11 @@ class SideMenu extends React.Component{
     changeDate = (moment) => this.props.updateSettings({date: moment});
     changeRange = (value) => this.props.updateSettings({range: value});
     changeCity = (value) => this.props.updateSettings({city: value});
-    changeGenres = (values) => this.props.updateSettings({genres: values});
+    changeGenres = (values,Option) => {
+        console.log(values)
+        this.props.updateSettings({genres: values})
+        console.log(this.props.settings.genres)
+    };
 
     render(){
         const marks = {
@@ -94,7 +97,6 @@ class SideMenu extends React.Component{
                             style={{ width: '100%' }}
                             placeholder="Please select"
                             onChange={this.changeGenres}
-                            value={settings.genres}
                         >
                             {children}
                         </Select>
