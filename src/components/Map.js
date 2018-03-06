@@ -122,17 +122,17 @@ class Map extends React.Component{
     }
 
     findGigs(latitude, longitude, map){
+        const origin = 'https://cors-anywhere.herokuapp.com/';
         let url = 'http://api.eventful.com/json/events/search?app_key=vHdXThWsm6Xn9HPP&';
         url+='&where='+encodeURIComponent(latitude)+','+encodeURIComponent(longitude);
         url+='&category=music';
         url+='&within='+encodeURIComponent(this.props.settings.range)+'&units=km';
         url+='&sort_order=date&page_size=20&date=Future';
-        console.log(this.props.settings)
+        url+='&keywords='
         for(const genre of this.props.settings.genres){
-            console.log(genre)
-            url+='&keywords='+encodeURIComponent(genre);
+            url+=encodeURIComponent(genre)+',';
         }
-        window.fetch(url, {
+        window.fetch(origin+url, {
             method: 'GET',
         }).then((data) => data.json())
         .then((data) => {
