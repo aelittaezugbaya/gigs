@@ -4,7 +4,7 @@ const initialState = {
   gigs: [],
   settings: {
     date: null,
-    range: 10,
+    range: 250,
     city: 'Helsinki',
     genres: [],
   },
