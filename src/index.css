@@ -150,3 +150,8 @@ h5{
   .ant-spin-show-text{
       height: 100%;
   }
+
+  .list{
+      height: 50%;
+      overflow-y:scroll;
+  }
