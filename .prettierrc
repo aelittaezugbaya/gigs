@@ -1,0 +1,39 @@
+{
+  "printWidth": 100,
+  "overrides": [
+    {
+      "files": ["*.js", "*.jsx"],
+      "options": {
+        "singleQuote": true,
+        "trailingComma": "all"
+      }
+    },
+    {
+      "files": ["configs/*.js", "./*.js", ".storybook/*.js"],
+      "options": {
+        "trailingComma": "es5"
+      }
+    },
+    {
+      "files": ["*.ts", "*.tsx"],
+      "options": {
+        "singleQuote": true,
+        "trailingComma": "all",
+        "parser": "typescript"
+      }
+    },
+    {
+      "files": ["*.css", "*.scss", "*.scssm"],
+      "options": {
+        "parser": "scss",
+        "singleQuote": true
+      }
+    },
+    {
+      "files": "*.json",
+      "options": {
+        "parser": "json"
+      }
+    }
+  ]
+}
