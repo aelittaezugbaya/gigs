@@ -9,7 +9,7 @@ const initialState = {
     city: 'Helsinki',
     genres: [],
   },
-  loading: false,
+  loading: true,
 };
 
 function gigsApp(state, action) {
