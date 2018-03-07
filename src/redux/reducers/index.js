@@ -2,12 +2,14 @@ import actions from '../actions';
 
 const initialState = {
   gigs: [],
+  gigsByArtist: [],
   settings: {
     date: null,
     range: 250,
     city: 'Helsinki',
     genres: [],
   },
+  loading: false,
 };
 
 function gigsApp(state, action) {
@@ -28,6 +30,18 @@ function gigsApp(state, action) {
           ...state.settings,
           ...action.payload,
         },
+      };
+      break;
+    case actions.SET_GIGS_BY_ARTISTS:
+      return {
+        ...state,
+        gigsByArtist: action.payload,
+      };
+      break;
+    case actions.SET_LOADING:
+      return {
+        ...state,
+        loading: action.payload,
       };
     default:
   }
