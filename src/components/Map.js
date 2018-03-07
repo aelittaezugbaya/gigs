@@ -14,6 +14,7 @@ class Map extends React.Component {
       artists: [],
     };
 
+
     this.findGigs = this.findGigs.bind(this);
   }
   promises = [];
@@ -34,7 +35,6 @@ class Map extends React.Component {
       center: [24.9384, 60.1699], // starting position
       zoom: 13, // starting zoom
     });
-
     // Add zoom and rotation controls to the map.
     map.addControl(new mapboxgl.NavigationControl());
     map.addControl(
@@ -68,22 +68,15 @@ class Map extends React.Component {
     let url = 'http://api.eventful.com/json/events/search?app_key=vHdXThWsm6Xn9HPP&';
     url += '&category=music&page_size=100';
     url += '&keywords=title:' + encodeURIComponent(name);
+    url += this.props.settings.date ? '&date=' + encodeURIComponent(this.props.settings.date) : '&date=Future'
     url += '&sort_order=date&page_size=20';
-    url +=
-      '&where=' +
-      encodeURIComponent(this.state.latitude) +
-      ',' +
-      encodeURIComponent(this.state.longitude);
+    url += '&where=' + encodeURIComponent(this.state.latitude) + ',' + encodeURIComponent(this.state.longitude);
     // url+='&location='+encodeURIComponent(this.props.settings.city);
     url += '&within=' + encodeURIComponent(this.props.settings.range) + '&units=km';
-
-    return window
-      .fetch(origin + url, {
-        method: 'GET',
-      })
-      .then(data => data.json())
+    window.fetch(origin + url, {
+      method: 'GET'
+    }).then(data => data.json())
       .then(data => {
-        console.log('got artist event');
         const sortedByName = [];
         if (data.events) {
           data.events.event.map(event => {
@@ -91,24 +84,53 @@ class Map extends React.Component {
               if (event.performers.performer.name) {
                 if (event.performers.performer.name.toUpperCase() == name.toUpperCase()) {
                   sortedByName.push(event);
+
                 }
               } else {
-                event.performers.performer.map(music => {
-                  if (music.name.toUpperCase() == name.toUpperCase()) {
-                    //console.log(music)
+                event.performers.performer.map(artist => {
+                  if (artist.name.toUpperCase() == name.toUpperCase()) {
                     sortedByName.push(event);
+
                   }
-                });
+                })
               }
             }
-          });
+          })
         }
+
+
         if (sortedByName.length > 0) {
+          const events = [];
+          for (const gig of sortedByName) {
+            events.push({
+              title: gig.title,
+              description: gig.description,
+              date: gig.start_time,
+              latitude: gig.latitude,
+              longitude: gig.longitude,
+              url: gig.url
+            })
+          }
+
+          const gigOfArtist = {
+            artist: name,
+            events: events
+          }
+
+          this.setState({
+            gigsOfAllArtists: this.state.gigsOfAllArtists.concat(gigOfArtist),
+          })
+          console.log('sorted');
           this.props.receiveGigs(this.props.gigs.concat(sortedByName));
-          this.putMarkers(this.state.map, this.props.gigs);
+          this.putMarkers(this.state.map, this.props.gigs)
+          console.log(this.props.gigs)
+          console.log(this.state.gigsOfAllArtists)
+
         }
-      });
+
+      })
   }
+
 
   getRecommendatedArtists(arrayOfArtists) {
     let string = '';
@@ -225,7 +247,7 @@ class Map extends React.Component {
       },
     });
 
-    map.on('click', 'places', function(e) {
+    map.on('click', 'places', function (e) {
       var coordinates = e.features[0].geometry.coordinates.slice();
       var description = e.features[0].properties.description;
 
@@ -240,12 +262,12 @@ class Map extends React.Component {
     });
 
     // Change the cursor to a pointer when the mouse is over the places layer.
-    map.on('mouseenter', 'places', function() {
+    map.on('mouseenter', 'places', function () {
       map.getCanvas().style.cursor = 'pointer';
     });
 
     // Change it back to a pointer when it leaves.
-    map.on('mouseleave', 'places', function() {
+    map.on('mouseleave', 'places', function () {
       map.getCanvas().style.cursor = '';
     });
   }
@@ -277,13 +299,13 @@ class Map extends React.Component {
       this.promises = [];
       window
         .fetch(
-          `https://api.mapbox.com/geocoding/v5/mapbox.places/${
-            settings.city
-          }.json?access_token=pk.eyJ1IjoiYWVsaXR0YWUiLCJhIjoiY2pkdzF3bWN6MGZudjJ2b2hlN2x0ZWM2OCJ9.lM3nZt9piPiGYrpDiGAOHw&autocomplete=true&limit=1`,
-          {
-            method: 'GET',
-          },
-        )
+        `https://api.mapbox.com/geocoding/v5/mapbox.places/${
+        settings.city
+        }.json?access_token=pk.eyJ1IjoiYWVsaXR0YWUiLCJhIjoiY2pkdzF3bWN6MGZudjJ2b2hlN2x0ZWM2OCJ9.lM3nZt9piPiGYrpDiGAOHw&autocomplete=true&limit=1`,
+        {
+          method: 'GET',
+        },
+      )
         .then(data => data.json())
         .then(data => {
           this.state.map.setCenter(data.features[0].center);
@@ -301,7 +323,7 @@ class Map extends React.Component {
     }
   }
 
-  renderMap() {}
+  renderMap() { }
 
   render() {
     return <div id="map" />;
