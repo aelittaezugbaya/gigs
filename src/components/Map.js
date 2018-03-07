@@ -176,7 +176,10 @@ class Map extends React.Component {
     );
   }
 
-  doneReceiving = () => console.log('DONE');
+  doneReceiving = () => {
+    this.promises = [];
+    console.log('DONE');
+  };
 
   putMarkers(map, events) {
     const gigs = [];
@@ -271,6 +274,7 @@ class Map extends React.Component {
 
   findGigsBySettings(settings) {
     if (settings.city) {
+      this.promises = [];
       window
         .fetch(
           `https://api.mapbox.com/geocoding/v5/mapbox.places/${
@@ -288,8 +292,9 @@ class Map extends React.Component {
             latitude: data.features[0].center[1],
           });
           for (const artist of this.state.artists) {
-            this.getArtistEvent(artist);
+            this.promises.push(this.getArtistEvent(artist));
           }
+          Promise.all(this.promises).then(this.doneReceiving);
         });
     } else {
       this.findGigs(this.state.latitude, this.state.longitude, this.state.map);
