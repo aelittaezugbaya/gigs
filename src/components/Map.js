@@ -201,7 +201,8 @@ class Map extends React.Component {
 
   doneReceiving = () => {
     this.promises = [];
-    this.props.updateLoading(true);
+    this.props.updateLoading(false);
+    console.log('done')
   };
 
   putMarkers(map, events) {
@@ -248,7 +249,7 @@ class Map extends React.Component {
       },
     });
 
-    map.on('click', 'places', function(e) {
+    map.on('click', 'places', function (e) {
       var coordinates = e.features[0].geometry.coordinates.slice();
       var description = e.features[0].properties.description;
 
@@ -263,12 +264,12 @@ class Map extends React.Component {
     });
 
     // Change the cursor to a pointer when the mouse is over the places layer.
-    map.on('mouseenter', 'places', function() {
+    map.on('mouseenter', 'places', function () {
       map.getCanvas().style.cursor = 'pointer';
     });
 
     // Change it back to a pointer when it leaves.
-    map.on('mouseleave', 'places', function() {
+    map.on('mouseleave', 'places', function () {
       map.getCanvas().style.cursor = '';
     });
   }
@@ -298,15 +299,16 @@ class Map extends React.Component {
   findGigsBySettings(settings) {
     if (settings.city) {
       this.promises = [];
+      this.props.updateLoading(true)
       window
         .fetch(
-          `https://api.mapbox.com/geocoding/v5/mapbox.places/${
-            settings.city
-          }.json?access_token=pk.eyJ1IjoiYWVsaXR0YWUiLCJhIjoiY2pkdzF3bWN6MGZudjJ2b2hlN2x0ZWM2OCJ9.lM3nZt9piPiGYrpDiGAOHw&autocomplete=true&limit=1`,
-          {
-            method: 'GET',
-          },
-        )
+        `https://api.mapbox.com/geocoding/v5/mapbox.places/${
+        settings.city
+        }.json?access_token=pk.eyJ1IjoiYWVsaXR0YWUiLCJhIjoiY2pkdzF3bWN6MGZudjJ2b2hlN2x0ZWM2OCJ9.lM3nZt9piPiGYrpDiGAOHw&autocomplete=true&limit=1`,
+        {
+          method: 'GET',
+        },
+      )
         .then(data => data.json())
         .then(data => {
           this.state.map.setCenter(data.features[0].center);
@@ -324,17 +326,18 @@ class Map extends React.Component {
     }
   }
 
-  renderMap() {}
+  renderMap() { }
 
   render() {
     return <div id="map" />;
   }
 }
 
-const mapStateToProps = ({ gigs, settings, gigsByArtist }) => ({
+const mapStateToProps = ({ gigs, settings, gigsByArtist, loading }) => ({
   gigs,
   settings,
   gigsByArtist,
+  loading
 });
 
 const mapDispatchToProps = dispatch => ({

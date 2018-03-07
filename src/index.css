@@ -122,3 +122,31 @@ h5{
   .login100-form-btn:hover {
     background: #333333;
   }
+
+  .ant-spin-nested-loading{
+      height: 100%;
+  }
+
+  .ant-spin-container .ant-spin-blur{
+    height: 100%;
+  }
+
+  .ant-spin-container{
+      height: 100%;
+  }
+
+  .ant-spin {
+      height: 100%;
+  }
+  
+  .ant-spin-lg {
+      height: 100%;
+  }
+  
+  .ant-spin-spinning {
+      height: 100%;
+  }
+  
+  .ant-spin-show-text{
+      height: 100%;
+  }
