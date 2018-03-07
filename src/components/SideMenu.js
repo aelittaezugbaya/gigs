@@ -116,18 +116,19 @@ class SideMenu extends React.Component {
             </Select>
           </Panel>
         </Collapse>
-
-        <List
-          itemLayout="horizontal"
-          dataSource={this.props.gigs}
-          renderItem={item => (
-            <List.Item>
-              <a href={item.url} target="_blank">
-                {item.title} {item.start_time}
-              </a>
-            </List.Item>
-          )}
-        />
+        <div className='list'>
+          <List
+            itemLayout="horizontal"
+            dataSource={this.props.gigs}
+            renderItem={item => (
+              <List.Item>
+                <a href={item.url} target="_blank">
+                  {item.title} {item.start_time}
+                </a>
+              </List.Item>
+            )}
+          />
+        </div>
         <footer className="text-center">
           <Button type="danger" className="logout " size="large" onClick={this.logOut}>
             Log out
