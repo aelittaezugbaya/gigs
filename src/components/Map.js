@@ -12,6 +12,7 @@ class Map extends React.Component {
       settings: this.props.settings,
       gigs: [],
       artists: [],
+      gigsOfAllArtists: []
     };
 
 
@@ -73,7 +74,7 @@ class Map extends React.Component {
     url += '&where=' + encodeURIComponent(this.state.latitude) + ',' + encodeURIComponent(this.state.longitude);
     // url+='&location='+encodeURIComponent(this.props.settings.city);
     url += '&within=' + encodeURIComponent(this.props.settings.range) + '&units=km';
-    window.fetch(origin + url, {
+    return window.fetch(origin + url, {
       method: 'GET'
     }).then(data => data.json())
       .then(data => {
@@ -133,6 +134,7 @@ class Map extends React.Component {
 
 
   getRecommendatedArtists(arrayOfArtists) {
+
     let string = '';
     for (let i = 0; i < 5; i++) {
       string += arrayOfArtists[i].id + ',';
@@ -167,6 +169,7 @@ class Map extends React.Component {
   }
 
   getFavouriteArtists() {
+    console.log('first')
     this.promises.push(
       window
         .fetch('https://api.spotify.com/v1/me/top/artists', {
