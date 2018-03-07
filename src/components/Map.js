@@ -12,9 +12,8 @@ class Map extends React.Component {
       settings: this.props.settings,
       gigs: [],
       artists: [],
-      gigsOfAllArtists: []
+      gigsOfAllArtists: [],
     };
-
 
     this.findGigs = this.findGigs.bind(this);
   }
@@ -69,14 +68,22 @@ class Map extends React.Component {
     let url = 'http://api.eventful.com/json/events/search?app_key=vHdXThWsm6Xn9HPP&';
     url += '&category=music&page_size=100';
     url += '&keywords=title:' + encodeURIComponent(name);
-    url += this.props.settings.date ? '&date=' + encodeURIComponent(this.props.settings.date) : '&date=Future'
+    url += this.props.settings.date
+      ? '&date=' + encodeURIComponent(this.props.settings.date)
+      : '&date=Future';
     url += '&sort_order=date&page_size=20';
-    url += '&where=' + encodeURIComponent(this.state.latitude) + ',' + encodeURIComponent(this.state.longitude);
+    url +=
+      '&where=' +
+      encodeURIComponent(this.state.latitude) +
+      ',' +
+      encodeURIComponent(this.state.longitude);
     // url+='&location='+encodeURIComponent(this.props.settings.city);
     url += '&within=' + encodeURIComponent(this.props.settings.range) + '&units=km';
-    return window.fetch(origin + url, {
-      method: 'GET'
-    }).then(data => data.json())
+    return window
+      .fetch(origin + url, {
+        method: 'GET',
+      })
+      .then(data => data.json())
       .then(data => {
         const sortedByName = [];
         if (data.events) {
@@ -85,20 +92,17 @@ class Map extends React.Component {
               if (event.performers.performer.name) {
                 if (event.performers.performer.name.toUpperCase() == name.toUpperCase()) {
                   sortedByName.push(event);
-
                 }
               } else {
                 event.performers.performer.map(artist => {
                   if (artist.name.toUpperCase() == name.toUpperCase()) {
                     sortedByName.push(event);
-
                   }
-                })
+                });
               }
             }
-          })
+          });
         }
-
 
         if (sortedByName.length > 0) {
           const events = [];
@@ -109,32 +113,26 @@ class Map extends React.Component {
               date: gig.start_time,
               latitude: gig.latitude,
               longitude: gig.longitude,
-              url: gig.url
-            })
+              url: gig.url,
+            });
           }
 
           const gigOfArtist = {
             artist: name,
-            events: events
-          }
-
-          this.setState({
-            gigsOfAllArtists: this.state.gigsOfAllArtists.concat(gigOfArtist),
-          })
+            events: events,
+          };
+          console.log(this.props);
+          this.props.setGigsByArtist([...this.props.gigsByArtist, gigOfArtist]);
           console.log('sorted');
           this.props.receiveGigs(this.props.gigs.concat(sortedByName));
-          this.putMarkers(this.state.map, this.props.gigs)
-          console.log(this.props.gigs)
-          console.log(this.state.gigsOfAllArtists)
-
+          this.putMarkers(this.state.map, this.props.gigs);
+          console.log(this.props.gigs);
+          console.log(this.state.gigsOfAllArtists);
         }
-
-      })
+      });
   }
 
-
   getRecommendatedArtists(arrayOfArtists) {
-
     let string = '';
     for (let i = 0; i < 5; i++) {
       string += arrayOfArtists[i].id + ',';
@@ -169,7 +167,7 @@ class Map extends React.Component {
   }
 
   getFavouriteArtists() {
-    console.log('first')
+    console.log('first');
     this.promises.push(
       window
         .fetch('https://api.spotify.com/v1/me/top/artists', {
@@ -203,7 +201,7 @@ class Map extends React.Component {
 
   doneReceiving = () => {
     this.promises = [];
-    console.log('DONE');
+    this.props.updateLoading(true);
   };
 
   putMarkers(map, events) {
@@ -250,7 +248,7 @@ class Map extends React.Component {
       },
     });
 
-    map.on('click', 'places', function (e) {
+    map.on('click', 'places', function(e) {
       var coordinates = e.features[0].geometry.coordinates.slice();
       var description = e.features[0].properties.description;
 
@@ -265,12 +263,12 @@ class Map extends React.Component {
     });
 
     // Change the cursor to a pointer when the mouse is over the places layer.
-    map.on('mouseenter', 'places', function () {
+    map.on('mouseenter', 'places', function() {
       map.getCanvas().style.cursor = 'pointer';
     });
 
     // Change it back to a pointer when it leaves.
-    map.on('mouseleave', 'places', function () {
+    map.on('mouseleave', 'places', function() {
       map.getCanvas().style.cursor = '';
     });
   }
@@ -302,13 +300,13 @@ class Map extends React.Component {
       this.promises = [];
       window
         .fetch(
-        `https://api.mapbox.com/geocoding/v5/mapbox.places/${
-        settings.city
-        }.json?access_token=pk.eyJ1IjoiYWVsaXR0YWUiLCJhIjoiY2pkdzF3bWN6MGZudjJ2b2hlN2x0ZWM2OCJ9.lM3nZt9piPiGYrpDiGAOHw&autocomplete=true&limit=1`,
-        {
-          method: 'GET',
-        },
-      )
+          `https://api.mapbox.com/geocoding/v5/mapbox.places/${
+            settings.city
+          }.json?access_token=pk.eyJ1IjoiYWVsaXR0YWUiLCJhIjoiY2pkdzF3bWN6MGZudjJ2b2hlN2x0ZWM2OCJ9.lM3nZt9piPiGYrpDiGAOHw&autocomplete=true&limit=1`,
+          {
+            method: 'GET',
+          },
+        )
         .then(data => data.json())
         .then(data => {
           this.state.map.setCenter(data.features[0].center);
@@ -326,16 +324,17 @@ class Map extends React.Component {
     }
   }
 
-  renderMap() { }
+  renderMap() {}
 
   render() {
     return <div id="map" />;
   }
 }
 
-const mapStateToProps = ({ gigs, settings }) => ({
+const mapStateToProps = ({ gigs, settings, gigsByArtist }) => ({
   gigs,
   settings,
+  gigsByArtist,
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -343,6 +342,16 @@ const mapDispatchToProps = dispatch => ({
     dispatch({
       type: actions.RECEIVE_GIGS,
       payload: gigs,
+    }),
+  setGigsByArtist: gigs =>
+    dispatch({
+      type: actions.SET_GIGS_BY_ARTISTS,
+      payload: gigs,
+    }),
+  updateLoading: ready =>
+    dispatch({
+      type: actions.SET_LOADING,
+      payload: ready,
     }),
 });
 
