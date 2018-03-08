@@ -6,7 +6,7 @@ const initialState = {
   settings: {
     date: null,
     range: 250,
-    city: 'Helsinki',
+    city: null,
     genres: [],
   },
   loading: true,
