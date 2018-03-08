@@ -25,8 +25,18 @@ class SideMenu extends React.Component {
     const arrayOfCitirs = [];
     this.state = {
       cities: arrayOfCitirs,
+      sliderValue: 250
     };
     this.logOut = this.logOut.bind(this);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.settings.city) {
+      console.log('citu')
+      this.setState({
+        sliderValue: 250
+      })
+    }
   }
 
   logOut() {
@@ -40,7 +50,12 @@ class SideMenu extends React.Component {
     const range = from + '-' + to;
     this.props.updateSettings({ date: range });
   };
-  changeRange = value => this.props.updateSettings({ range: value });
+  changeRange = value => {
+    this.props.updateSettings({ range: value });
+    this.setState({
+      sliderValue: value
+    })
+  }
   changeCity = value => this.props.updateSettings({ city: value });
   changeGenres = (values, Option) => {
     console.log(values);
@@ -91,12 +106,14 @@ class SideMenu extends React.Component {
             <RangePicker onChange={this.changeDate} format={dateFormat} />
             <h5>Area range</h5>
             <Slider
+              id='slider'
               marks={marks}
               defaultValue={20}
               max={250}
               tipFormatter={formatter}
-              onAfterChange={this.changeRange}
-              defaultValue={settings.range}
+              onChange={this.changeRange}
+
+              value={this.state.sliderValue}
             />
             <h5>Change city</h5>
             <Input.Search

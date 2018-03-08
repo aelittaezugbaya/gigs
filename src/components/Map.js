@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import actions from '../redux/actions';
 import mapboxgl from 'mapbox-gl/dist/mapbox-gl.js';
 import { Row, Col } from 'antd';
+import distanceInKmBetweenEarthCoordinates from '../utils/calcDistance'
 import 'lodash';
 
 class Map extends React.Component {
@@ -21,9 +22,15 @@ class Map extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     if (_.isEqual(this.props.settings, nextProps.settings) == false) {
-      this.props = nextProps;
-      this.props.receiveGigs([]);
-      this.findGigsBySettings(nextProps.settings);
+      console.log(nextProps)
+      if (this.props.settings.city != nextProps.settings.city) {
+        this.props = nextProps;
+        this.findGigsByCity(nextProps.settings);
+      } else if (nextProps.settings.range < 250) {
+        this.props = nextProps;
+        this.filterEventsByRange(this.props.settings.range);
+      }
+      //
     }
   }
   componentDidMount() {
@@ -63,6 +70,24 @@ class Map extends React.Component {
     });
   }
 
+  filterEventsByRange(range) {
+    console.log("range" + range)
+    const sorted = [];
+    console.log('empty')
+    console.log(this.props.gigs)
+    console.log(this.props.gigsByArtist)
+    for (event of this.props.gigsByArtist) {
+      const distance = distanceInKmBetweenEarthCoordinates(this.state.latitude, this.state.longitude, event.latitude, event.longitude);
+      if (distance < range) {
+        console.log(distance)
+        sorted.push(event)
+      }
+    }
+    console.log(sorted)
+    this.props.receiveGigs(sorted);
+    console.log(this.props.gigs)
+  }
+
   getArtistEvent(name) {
     const origin = 'https://cors-anywhere.herokuapp.com/';
     let url = 'http://api.eventful.com/json/events/search?app_key=vHdXThWsm6Xn9HPP&';
@@ -78,7 +103,7 @@ class Map extends React.Component {
       ',' +
       encodeURIComponent(this.state.longitude);
     // url+='&location='+encodeURIComponent(this.props.settings.city);
-    url += '&within=' + encodeURIComponent(this.props.settings.range) + '&units=km';
+    url += '&within=250&units=km';
     return window
       .fetch(origin + url, {
         method: 'GET',
@@ -108,26 +133,22 @@ class Map extends React.Component {
           const events = [];
           for (const gig of sortedByName) {
             events.push({
+              artist: name,
               title: gig.title,
               description: gig.description,
-              date: gig.start_time,
+              start_time: gig.start_time,
               latitude: gig.latitude,
               longitude: gig.longitude,
               url: gig.url,
             });
           }
 
-          const gigOfArtist = {
-            artist: name,
-            events: events,
-          };
-          console.log(this.props);
-          this.props.setGigsByArtist([...this.props.gigsByArtist, gigOfArtist]);
-          console.log('sorted');
+          this.props.setGigsByArtist(this.props.gigsByArtist.concat(events));
           this.props.receiveGigs(this.props.gigs.concat(sortedByName));
           this.putMarkers(this.state.map, this.props.gigs);
-          console.log(this.props.gigs);
-          console.log(this.state.gigsOfAllArtists);
+          // console.log('gigs');
+          // console.log(this.props.gigs);
+
         }
       });
   }
@@ -296,10 +317,16 @@ class Map extends React.Component {
       });
   }
 
-  findGigsBySettings(settings) {
+  findGigsByCity(settings) {
     if (settings.city) {
+      this.props.updateSettings({
+        range: 250,
+        date: null,
+        genres: [],
+      })
       this.promises = [];
-      this.props.updateLoading(true)
+      this.props.updateLoading(true);
+      this.props.receiveGigs([]);
       window
         .fetch(
         `https://api.mapbox.com/geocoding/v5/mapbox.places/${
@@ -355,6 +382,11 @@ const mapDispatchToProps = dispatch => ({
     dispatch({
       type: actions.SET_LOADING,
       payload: ready,
+    }),
+  updateSettings: setting =>
+    dispatch({
+      type: actions.UPDATE_SETTINGS,
+      payload: setting,
     }),
 });
 
