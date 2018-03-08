@@ -14,6 +14,7 @@ class Map extends React.Component {
       gigs: [],
       artists: [],
       gigsOfAllArtists: [],
+      markers: []
     };
 
     this.findGigs = this.findGigs.bind(this);
@@ -226,74 +227,101 @@ class Map extends React.Component {
     console.log('done')
   };
 
+
   putMarkers(map, events) {
-    const gigs = [];
-    if (map.getLayer('places')) {
-      map.removeLayer('places');
-      map.removeSource('source');
-    }
+    this.state.markers.forEach(marker => {
+      marker.remove()
+    })
+    this.setState({
+      markers: []
+    })
+    console.log(events)
     events.forEach(event => {
-      gigs.push({
-        type: 'Feature',
-        properties: {
-          description:
-            '<strong>' +
-            event.title +
-            '</strong><p>' +
-            event.description +
-            "</p><a href='" +
-            event.url +
-            '\'target="_blank" title="Opens in a new window">Link to the event</a>',
-          icon: 'music',
-        },
-        geometry: {
-          type: 'Point',
-          coordinates: [event.longitude, event.latitude],
-        },
-      });
-    });
-
-    map.addSource('source', {
-      type: 'geojson',
-      data: {
-        type: 'FeatureCollection',
-        features: gigs,
-      },
-    });
-    map.addLayer({
-      id: 'places',
-      type: 'symbol',
-      source: 'source',
-      layout: {
-        'icon-image': '{icon}-15',
-        'icon-allow-overlap': true,
-      },
-    });
-
-    map.on('click', 'places', function (e) {
-      var coordinates = e.features[0].geometry.coordinates.slice();
-      var description = e.features[0].properties.description;
-
-      while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-        coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
-      }
-
-      new mapboxgl.Popup()
-        .setLngLat(coordinates)
-        .setHTML(description)
-        .addTo(map);
-    });
-
-    // Change the cursor to a pointer when the mouse is over the places layer.
-    map.on('mouseenter', 'places', function () {
-      map.getCanvas().style.cursor = 'pointer';
-    });
-
-    // Change it back to a pointer when it leaves.
-    map.on('mouseleave', 'places', function () {
-      map.getCanvas().style.cursor = '';
-    });
+      const popup = new mapboxgl.Popup()
+        .setHTML('<strong>' +
+        event.title +
+        '</strong><p>' +
+        event.description +
+        "</p><a href='" +
+        event.url +
+        '\'target="_blank" title="Opens in a new window">Link to the event</a>')
+      const marker = new mapboxgl.Marker()
+        .setLngLat([event.longitude, event.latitude])
+        .setPopup(popup) // sets a popup on this marker
+        .addTo(this.state.map)
+      this.setState({
+        markers: this.state.markers.concat(marker)
+      })
+    })
   }
+  // putMarkers(map, events) {
+  //   const gigs = [];
+  //   if (map.getLayer('places')) {
+  //     map.removeLayer('places');
+  //     map.removeSource('source');
+  //   }
+  //   events.forEach(event => {
+  //     gigs.push({
+  //       type: 'Feature',
+  //       properties: {
+  //         description:
+  //           '<strong>' +
+  //           event.title +
+  //           '</strong><p>' +
+  //           event.description +
+  //           "</p><a href='" +
+  //           event.url +
+  //           '\'target="_blank" title="Opens in a new window">Link to the event</a>',
+  //         icon: 'music',
+  //       },
+  //       geometry: {
+  //         type: 'Point',
+  //         coordinates: [event.longitude, event.latitude],
+  //       },
+  //     });
+  //   });
+
+  //   map.addSource('source', {
+  //     type: 'geojson',
+  //     data: {
+  //       type: 'FeatureCollection',
+  //       features: gigs,
+  //     },
+  //   });
+  //   map.addLayer({
+  //     id: 'places',
+  //     type: 'symbol',
+  //     source: 'source',
+  //     layout: {
+  //       'icon-image': '{icon}-15',
+  //       'icon-allow-overlap': true,
+  //     },
+  //   });
+
+  //   map.on('click', 'places', function (e) {
+  //     var coordinates = e.features[0].geometry.coordinates.slice();
+  //     var description = e.features[0].properties.description;
+
+  //     while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+  //       coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+  //     }
+
+  //     new mapboxgl.Popup()
+  //       .setLngLat(coordinates)
+  //       .setHTML(description)
+  //       .addTo(map);
+  //   });
+
+  //   // Change the cursor to a pointer when the mouse is over the places layer.
+  //   map.on('mouseenter', 'places', function () {
+  //     map.getCanvas().style.cursor = 'pointer';
+  //   });
+
+  //   // Change it back to a pointer when it leaves.
+  //   map.on('mouseleave', 'places', function () {
+  //     map.getCanvas().style.cursor = '';
+  //   });
+  // }
 
   findGigs(latitude, longitude, map) {
     const origin = 'https://cors-anywhere.herokuapp.com/';
