@@ -71,7 +71,12 @@ class SideMenu extends React.Component {
   changeCity = value => this.props.updateSettings({ city: value });
   changeGenres = (values, Option) => {
     console.log(values);
-    this.props.updateSettings({ genres: values });
+    if (values) {
+      this.props.updateSettings({ genres: values });
+    } else {
+      this.props.updateSettings({ genres: null });
+    }
+
     console.log(this.props.settings.genres);
   };
 
@@ -96,7 +101,7 @@ class SideMenu extends React.Component {
 
     const children = [];
     for (let i = 0; i < 6; i++) {
-      children.push(<Option key={genre[i]}>{genre[i]}</Option>);
+      children.push(<Option key={i}>{genre[i]}</Option>);
     }
 
     const { settings } = this.props;
@@ -136,7 +141,8 @@ class SideMenu extends React.Component {
             />
             <h5>Choose genres</h5>
             <Select
-              mode="multiple"
+              showSearch
+              allowClear
               style={{ width: '100%' }}
               placeholder="Please select"
               onChange={this.changeGenres}
