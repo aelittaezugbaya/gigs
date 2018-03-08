@@ -25,10 +25,21 @@ class Map extends React.Component {
   componentWillReceiveProps(nextProps) {
     if (_.isEqual(this.props.settings, nextProps.settings) == false) {
       console.log(nextProps)
-      if (this.props.settings.city != nextProps.settings.city) {
+      if (nextProps.settings.genres) {
         this.props = nextProps;
-        this.findGigsByCity(nextProps.settings);
-
+        if (this.props.settings.city != nextProps.settings.city) {
+          this.findGigsByCity(this.props.settings, true)
+        } else {
+          this.findGigs();
+        }
+      } else if (this.props.settings.genres && nextProps.settings.genres == null) {
+        this.props = nextProps;
+        this.putMarkers(this.state.map, this.props.gigsByArtist);
+        this.props.receiveGigs(this.props.gigsByArtist);
+        //this.resetSettings();
+      } else if (this.props.settings.city != nextProps.settings.city) {
+        this.props = nextProps;
+        this.findGigsByCity(nextProps.settings, false);
       } else if (nextProps.settings.range < 250 && nextProps.settings.date) {
         this.props = nextProps;
         this.filterEventsByDateRangeAndByDistance()
@@ -126,6 +137,15 @@ class Map extends React.Component {
     console.log(sorted)
     this.props.receiveGigs(sorted);
     console.log(this.props.gigs)
+  }
+
+  resetSettings() {
+    this.props.updateSettings({
+      date: null,
+      range: 250,
+      city: null,
+      genres: [],
+    })
   }
 
   getArtistEvent(name) {
@@ -374,30 +394,31 @@ class Map extends React.Component {
   //   });
   // }
 
-  findGigs(latitude, longitude, map) {
+  findGigs() {
     const origin = 'https://cors-anywhere.herokuapp.com/';
     let url = 'http://api.eventful.com/json/events/search?app_key=vHdXThWsm6Xn9HPP&';
-    url += '&where=' + encodeURIComponent(latitude) + ',' + encodeURIComponent(longitude);
+    url += '&where=' + encodeURIComponent(this.state.latitude) + ',' + encodeURIComponent(this.state.longitude);
     url += '&category=music';
     url += '&within=' + encodeURIComponent(this.props.settings.range) + '&units=km';
     url += '&sort_order=date&page_size=20&date=Future';
-    url += '&keywords=';
-    for (const genre of this.props.settings.genres) {
-      url += encodeURIComponent(genre) + ',';
-    }
+    url += '&keywords=Jazz';
+    // for (const genre of this.props.settings.genres) {
+    //   url += encodeURIComponent(genre) + ',';
+    // }
     window
       .fetch(origin + url, {
         method: 'GET',
       })
       .then(data => data.json())
       .then(data => {
+        console.log(data.events)
         this.props.receiveGigs(data.events.event);
-        this.putMarkers(map, data.events.event);
+        this.putMarkers(this.state.map, data.events.event);
       });
   }
 
 
-  findGigsByCity(settings) {
+  findGigsByCity(settings, byGenres) {
     if (settings.city) {
       this.props.updateSettings({
         range: 250,
@@ -423,13 +444,16 @@ class Map extends React.Component {
             longitude: data.features[0].center[0],
             latitude: data.features[0].center[1],
           });
-          for (const artist of this.state.artists) {
-            this.promises.push(this.getArtistEvent(artist));
+          if (byGenres) {
+            this.findGigs()
+          } else {
+            for (const artist of this.state.artists) {
+              this.promises.push(this.getArtistEvent(artist));
+            }
+            Promise.all(this.promises).then(this.doneReceiving);
           }
-          Promise.all(this.promises).then(this.doneReceiving);
+
         });
-    } else {
-      this.findGigs(this.state.latitude, this.state.longitude, this.state.map);
     }
   }
 
