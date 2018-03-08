@@ -7,24 +7,36 @@ import jwt_decode from 'jwt-decode';
 import { Spin } from 'antd';
 import { connect } from 'react-redux';
 import actions from '../redux/actions';
+import moment from 'moment';
 
 
 class App extends React.Component {
     constructor(props) {
         super(props);
+
         if (window.location.hash) {
+            console.log(window.location.hash)
             const stateKey = 'spotify_auth_state';
             const params = this.getHashParams();
-
             const access_token = params.access_token
             const state = params.state
             const storedState = localStorage.getItem(stateKey);
             window.localStorage.accessToken = access_token;
+            const exp = moment().add(params.expires_in, 's');
+            window.localStorage.exp = exp;
             this.state = {
                 jwt: window.localStorage.accessToken
             }
-            window.location = 'http://localhost:8080/';
+            //window.location = 'http://localhost:8080/';
         }
+
+        if (window.localStorage.exp && moment().isAfter(window.localStorage.exp)) {
+            delete window.localStorage.access_token;
+            delete window.localStorage.exp;
+        } else {
+            console.log(true)
+        }
+
         this.state = {
             jwt: window.localStorage.accessToken ? window.localStorage.accessToken : ''
         }
