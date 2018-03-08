@@ -5,6 +5,7 @@ import mapboxgl from 'mapbox-gl/dist/mapbox-gl.js';
 import { Row, Col } from 'antd';
 import distanceInKmBetweenEarthCoordinates from '../utils/calcDistance'
 import 'lodash';
+import moment from 'moment'
 
 class Map extends React.Component {
   constructor(props) {
@@ -27,13 +28,51 @@ class Map extends React.Component {
       if (this.props.settings.city != nextProps.settings.city) {
         this.props = nextProps;
         this.findGigsByCity(nextProps.settings);
+
+      } else if (nextProps.settings.range < 250 && nextProps.settings.date) {
+        this.props = nextProps;
+        this.filterEventsByDateRangeAndByDistance()
       } else if (nextProps.settings.range < 250) {
         this.props = nextProps;
         this.filterEventsByRange(this.props.settings.range);
+      } else if (nextProps.settings.date) {
+        this.props = nextProps;
+        this.filterEventsByDateRange(nextProps.gigs)
+      } else if (nextProps.settings.range < 250 && nextProps.setting.date) {
+        this.filterEventsByDateRangeAndByDistance()
       }
       //
     }
   }
+
+  filterEventsByDateRangeAndByDistance() {
+    console.log('lol')
+    const sorted = [];
+    // sort by time
+    const from = moment(this.props.settings.date[0], 'YYYYMMDD');
+    const to = moment(this.props.settings.date[1], 'YYYYMMDD');
+    console.log(this.props.gigsByArtist)
+    this.props.gigsByArtist.forEach(event => {
+      const eventDate = moment(event.start_time);
+      if (eventDate.isAfter(from) && eventDate.isBefore(to)) {
+        sorted.push(event)
+      }
+    })
+    console.log(sorted)
+    //
+    const sortedByDistance = [];
+    for (event of sorted) {
+      const distance = distanceInKmBetweenEarthCoordinates(this.state.latitude, this.state.longitude, event.latitude, event.longitude);
+      if (distance < this.props.settings.range) {
+        sortedByDistance.push(event)
+      }
+    }
+    console.log(sortedByDistance)
+    this.props.receiveGigs(sortedByDistance);
+    this.putMarkers(this.state.map, sortedByDistance);
+    console.log(this.props.gigs)
+  }
+
   componentDidMount() {
     mapboxgl.accessToken =
       'pk.eyJ1IjoiYWVsaXR0YWUiLCJhIjoiY2pkeWlsODg0MHp4dTMzbzZncTI0dzBpdCJ9.6YIUNwH0qV7HZqxkmel2DQ';
@@ -94,9 +133,7 @@ class Map extends React.Component {
     let url = 'http://api.eventful.com/json/events/search?app_key=vHdXThWsm6Xn9HPP&';
     url += '&category=music&page_size=100';
     url += '&keywords=title:' + encodeURIComponent(name);
-    url += this.props.settings.date
-      ? '&date=' + encodeURIComponent(this.props.settings.date)
-      : '&date=Future';
+    url += '&date=Future';
     url += '&sort_order=date&page_size=20';
     url +=
       '&where=' +
@@ -227,6 +264,20 @@ class Map extends React.Component {
     console.log('done')
   };
 
+  filterEventsByDateRange(events) {
+    const sorted = [];
+    console.log(this.props.settings.date)
+    const from = moment(this.props.settings.date[0], 'YYYYMMDD');
+    const to = moment(this.props.settings.date[1], 'YYYYMMDD');
+    events.forEach(event => {
+      const eventDate = moment(event.start_time);
+      if (eventDate.isAfter(from) && eventDate.isBefore(to)) {
+        sorted.push(event)
+      }
+    })
+    this.props.receiveGigs(sorted);
+    console.log(sorted)
+  }
 
   putMarkers(map, events) {
     this.state.markers.forEach(marker => {
@@ -344,6 +395,7 @@ class Map extends React.Component {
         this.putMarkers(map, data.events.event);
       });
   }
+
 
   findGigsByCity(settings) {
     if (settings.city) {

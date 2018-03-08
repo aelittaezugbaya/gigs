@@ -25,7 +25,8 @@ class SideMenu extends React.Component {
     const arrayOfCitirs = [];
     this.state = {
       cities: arrayOfCitirs,
-      sliderValue: 250
+      sliderValue: 250,
+      dateValue: null
     };
     this.logOut = this.logOut.bind(this);
   }
@@ -33,8 +34,10 @@ class SideMenu extends React.Component {
   componentWillReceiveProps(nextProps) {
     if (nextProps.settings.city) {
       this.setState({
-        sliderValue: 250
+        sliderValue: 250,
+        dateValue: null
       })
+
     }
   }
 
@@ -44,10 +47,20 @@ class SideMenu extends React.Component {
   }
 
   changeDate = moment => {
-    const from = moment[0].format('YYYYMMDD00');
-    const to = moment[1].format('YYYYMMDD00');
-    const range = from + '-' + to;
-    this.props.updateSettings({ date: range });
+    if (moment[0]) {
+      const from = moment[0].format('YYYYMMDD');
+      const to = moment[1].format('YYYYMMDD');
+      this.setState({
+        dateValue: moment
+      })
+      this.props.updateSettings({ date: [from, to] });
+    } else {
+      this.setState({
+        dateValue: null
+      })
+      this.props.updateSettings({ date: null });
+    }
+
   };
   changeRange = value => {
     this.props.updateSettings({ range: value });
@@ -102,7 +115,7 @@ class SideMenu extends React.Component {
           >
             <h5>Choose date</h5>
             {/* <DatePicker onChange={this.changeDate} value={settings.date}/> */}
-            <RangePicker onChange={this.changeDate} format={dateFormat} />
+            <RangePicker onChange={this.changeDate} format={dateFormat} value={this.state.dateValue} />
             <h5>Area range</h5>
             <Slider
               id='slider'
