@@ -32,7 +32,8 @@ class SideMenu extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.settings.city) {
+    if (nextProps.settings.city != this.props.settings.city) {
+      this.props = nextProps;
       this.setState({
         sliderValue: 250,
         dateValue: null
