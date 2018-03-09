@@ -21,7 +21,7 @@ export default class Login extends React.Component {
     logIn() {
         const stateKey1 = 'spotify_auth_state';
         const client_id = '71247e62ff56404586d3398c81b57cf0'; // Your client id
-        const redirect_uri = 'http://users.metropolia.fi/~aelittae/gigs/'; // Your redirect uri
+        const redirect_uri = 'https://users.metropolia.fi/~aelittae/gigs/'; // Your redirect uri
         const state = this.generateRandomString(16);
         const stateKey = 'spotify_auth_state';
         localStorage.setItem(stateKey1, state);

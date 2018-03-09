@@ -27,7 +27,7 @@ class App extends React.Component {
             this.state = {
                 jwt: window.localStorage.accessToken
             }
-            window.location = 'http://users.metropolia.fi/~aelittae/gigs/';
+            window.location = 'https://users.metropolia.fi/~aelittae/gigs/';
         }
 
         if (window.localStorage.exp && moment().isAfter(window.localStorage.exp)) {

@@ -43,7 +43,7 @@ class SideMenu extends React.Component {
 
   logOut() {
     delete window.localStorage.accessToken;
-    window.location = 'http://users.metropolia.fi/~aelittae/gigs/';
+    window.location = 'https://users.metropolia.fi/~aelittae/gigs/';
   }
 
   changeDate = moment => {

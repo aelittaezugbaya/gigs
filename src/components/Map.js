@@ -107,17 +107,19 @@ class Map extends React.Component {
       }),
     );
 
-    const coords = map.getCenter()
-    // map.flyTo( {center: [coords.longitude,coords.latitude]});
-    console.log(coords)
-    //this.findGigs(coords.latitude, coords.longitude, map)
-    this.setState({
-      map: map,
-      latitude: coords[1],
-      longitude: coords[0],
+    navigator.geolocation.getCurrentPosition(position => {
+      const coords = position.coords;
+      // map.flyTo( {center: [coords.longitude,coords.latitude]});
+      map.setCenter([coords.longitude, coords.latitude]);
+      //this.findGigs(coords.latitude, coords.longitude, map)
+      this.setState({
+        map: map,
+        latitude: coords.latitude,
+        longitude: coords.longitude,
+      });
+      //this.findGigs(this.state.latitude, this.state.longitude, this.state.map)
+      this.getFavouriteArtists();
     });
-    //this.findGigs(this.state.latitude, this.state.longitude, this.state.map)
-    this.getFavouriteArtists();
 
   }
 
@@ -150,7 +152,7 @@ class Map extends React.Component {
 
   getArtistEvent(name) {
     const origin = 'https://cors-anywhere.herokuapp.com/';
-    let url = 'http://api.eventful.com/json/events/search?app_key=vHdXThWsm6Xn9HPP&';
+    let url = 'https://api.eventful.com/json/events/search?app_key=vHdXThWsm6Xn9HPP&';
     url += '&category=music&page_size=100';
     url += '&keywords=title:' + encodeURIComponent(name);
     url += '&date=Future';
@@ -163,13 +165,12 @@ class Map extends React.Component {
     // url+='&location='+encodeURIComponent(this.props.settings.city);
     url += '&within=250&units=km';
     return window
-      .fetch(origin + url, {
+      .fetch(url, {
         method: 'GET',
       })
-      .then(data => {
-        console.log(data)
+      .then(data =>
         data.json()
-      })
+      )
       .then(data => {
         console.log(data)
         const sortedByName = [];
