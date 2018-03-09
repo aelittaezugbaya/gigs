@@ -106,19 +106,19 @@ class Map extends React.Component {
         trackUserLocation: true,
       }),
     );
-    navigator.geolocation.getCurrentPosition(position => {
-      const coords = position.coords;
-      // map.flyTo( {center: [coords.longitude,coords.latitude]});
-      map.setCenter([coords.longitude, coords.latitude]);
-      //this.findGigs(coords.latitude, coords.longitude, map)
-      this.setState({
-        map: map,
-        latitude: coords.latitude,
-        longitude: coords.longitude,
-      });
-      //this.findGigs(this.state.latitude, this.state.longitude, this.state.map)
-      this.getFavouriteArtists();
+
+    const coords = map.getCenter()
+    // map.flyTo( {center: [coords.longitude,coords.latitude]});
+    console.log(coords)
+    //this.findGigs(coords.latitude, coords.longitude, map)
+    this.setState({
+      map: map,
+      latitude: coords[1],
+      longitude: coords[0],
     });
+    //this.findGigs(this.state.latitude, this.state.longitude, this.state.map)
+    this.getFavouriteArtists();
+
   }
 
   filterEventsByRange(range) {
@@ -166,8 +166,12 @@ class Map extends React.Component {
       .fetch(origin + url, {
         method: 'GET',
       })
-      .then(data => data.json())
       .then(data => {
+        console.log(data)
+        data.json()
+      })
+      .then(data => {
+        console.log(data)
         const sortedByName = [];
         if (data.events) {
           data.events.event.map(event => {
