@@ -10,6 +10,8 @@ const initialState = {
     genres: [],
   },
   loading: true,
+  currentLocation: null,
+  isGenre: false,
 };
 
 function gigsApp(state, action) {
@@ -42,6 +44,19 @@ function gigsApp(state, action) {
       return {
         ...state,
         loading: action.payload,
+      };
+    case actions.SET_CURRENT_LOCATION:
+      return {
+        ...state,
+        currentLocation: {
+          latitude: action.payload.latitude,
+          longitude: action.payload.longitude,
+        },
+      };
+    case actions.SET_IS_GENRE:
+      return {
+        ...state,
+        isGenre: action.payload,
       };
     default:
   }

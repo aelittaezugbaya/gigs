@@ -3,9 +3,9 @@ import { connect } from 'react-redux';
 import actions from '../redux/actions';
 import mapboxgl from 'mapbox-gl/dist/mapbox-gl.js';
 import { Row, Col } from 'antd';
-import distanceInKmBetweenEarthCoordinates from '../utils/calcDistance'
+import distanceInKmBetweenEarthCoordinates from '../utils/calcDistance';
 import 'lodash';
-import moment from 'moment'
+import moment from 'moment';
 import { error } from 'util';
 import { Button, Icon } from 'antd';
 
@@ -17,7 +17,7 @@ class Map extends React.Component {
       gigs: [],
       artists: [],
       gigsOfAllArtists: [],
-      markers: []
+      markers: [],
     };
 
     this.findGigs = this.findGigs.bind(this);
@@ -26,11 +26,11 @@ class Map extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     if (_.isEqual(this.props.settings, nextProps.settings) == false) {
-      console.log(nextProps)
+      console.log(nextProps);
       if (nextProps.settings.genres && nextProps.settings.genres.length > 0) {
         this.props = nextProps;
         if (this.props.settings.city != nextProps.settings.city) {
-          this.findGigsByCity(this.props.settings, true)
+          this.findGigsByCity(this.props.settings, true);
         } else {
           this.findGigs();
         }
@@ -44,46 +44,51 @@ class Map extends React.Component {
         this.findGigsByCity(nextProps.settings, false);
       } else if (nextProps.settings.range < 250 && nextProps.settings.date) {
         this.props = nextProps;
-        this.filterEventsByDateRangeAndByDistance()
+        this.filterEventsByDateRangeAndByDistance();
       } else if (nextProps.settings.range < 250) {
         this.props = nextProps;
         this.filterEventsByRange(this.props.settings.range);
       } else if (nextProps.settings.date) {
         this.props = nextProps;
-        this.filterEventsByDateRange(nextProps.gigs)
+        this.filterEventsByDateRange(nextProps.gigs);
       } else if (nextProps.settings.range < 250 && nextProps.setting.date) {
-        this.filterEventsByDateRangeAndByDistance()
+        this.filterEventsByDateRangeAndByDistance();
       }
       //
     }
   }
 
   filterEventsByDateRangeAndByDistance() {
-    console.log('lol')
+    console.log('lol');
     const sorted = [];
     // sort by time
     const from = moment(this.props.settings.date[0], 'YYYYMMDD');
     const to = moment(this.props.settings.date[1], 'YYYYMMDD');
-    console.log(this.props.gigsByArtist)
+    console.log(this.props.gigsByArtist);
     this.props.gigsByArtist.forEach(event => {
       const eventDate = moment(event.start_time);
       if (eventDate.isAfter(from) && eventDate.isBefore(to)) {
-        sorted.push(event)
+        sorted.push(event);
       }
-    })
-    console.log(sorted)
+    });
+    console.log(sorted);
     //
     const sortedByDistance = [];
     for (event of sorted) {
-      const distance = distanceInKmBetweenEarthCoordinates(this.state.latitude, this.state.longitude, event.latitude, event.longitude);
+      const distance = distanceInKmBetweenEarthCoordinates(
+        this.state.latitude,
+        this.state.longitude,
+        event.latitude,
+        event.longitude,
+      );
       if (distance < this.props.settings.range) {
-        sortedByDistance.push(event)
+        sortedByDistance.push(event);
       }
     }
-    console.log(sortedByDistance)
+    console.log(sortedByDistance);
     this.props.receiveGigs(sortedByDistance);
     this.putMarkers(this.state.map, sortedByDistance);
-    console.log(this.props.gigs)
+    console.log(this.props.gigs);
   }
 
   componentDidMount() {
@@ -118,28 +123,35 @@ class Map extends React.Component {
         latitude: coords.latitude,
         longitude: coords.longitude,
       });
+      console.log(coords);
+      this.props.setCurrentLocation(coords);
       //this.findGigs(this.state.latitude, this.state.longitude, this.state.map)
       this.getFavouriteArtists();
     });
   }
 
   filterEventsByRange(range) {
-    console.log("range" + range)
+    console.log('range' + range);
     const sorted = [];
-    console.log('empty')
-    console.log(this.props.gigs)
-    console.log(this.props.gigsByArtist)
+    console.log('empty');
+    console.log(this.props.gigs);
+    console.log(this.props.gigsByArtist);
     for (event of this.props.gigsByArtist) {
-      const distance = distanceInKmBetweenEarthCoordinates(this.state.latitude, this.state.longitude, event.latitude, event.longitude);
+      const distance = distanceInKmBetweenEarthCoordinates(
+        this.state.latitude,
+        this.state.longitude,
+        event.latitude,
+        event.longitude,
+      );
       if (distance < range) {
-        console.log(distance)
-        sorted.push(event)
+        console.log(distance);
+        sorted.push(event);
       }
     }
-    console.log(sorted)
+    console.log(sorted);
     this.props.receiveGigs(sorted);
-    this.putMarkers(this.state.map, sorted)
-    console.log(this.props.gigs)
+    this.putMarkers(this.state.map, sorted);
+    console.log(this.props.gigs);
   }
 
   resetSettings() {
@@ -148,7 +160,7 @@ class Map extends React.Component {
       range: 250,
       city: null,
       genres: [],
-    })
+    });
   }
 
   getArtistEvent(name) {
@@ -209,7 +221,6 @@ class Map extends React.Component {
           this.putMarkers(this.state.map, this.props.gigs);
           // console.log('gigs');
           // console.log(this.props.gigs);
-
         }
       })
       .catch(error => console.error(error));
@@ -285,52 +296,53 @@ class Map extends React.Component {
   doneReceiving = () => {
     this.promises = [];
     this.props.updateLoading(false);
-    console.log('done')
+    console.log('done');
   };
 
   filterEventsByDateRange(events) {
     const sorted = [];
-    console.log(this.props.settings.date)
+    console.log(this.props.settings.date);
     const from = moment(this.props.settings.date[0], 'YYYYMMDD');
     const to = moment(this.props.settings.date[1], 'YYYYMMDD');
     events.forEach(event => {
       const eventDate = moment(event.start_time);
       if (eventDate.isAfter(from) && eventDate.isBefore(to)) {
-        sorted.push(event)
+        sorted.push(event);
       }
-    })
+    });
     this.props.receiveGigs(sorted);
-    this.putMarkers(this.state.map, sorted)
-    console.log(sorted)
+    this.putMarkers(this.state.map, sorted);
+    console.log(sorted);
   }
 
   putMarkers(map, events) {
     this.state.markers.forEach(marker => {
-      marker.remove()
-    })
+      marker.remove();
+    });
     this.setState({
-      markers: null
-    })
+      markers: null,
+    });
     const newMarkers = [];
-    console.log(events)
+    console.log(events);
     events.forEach(event => {
-      const popup = new mapboxgl.Popup()
-        .setHTML('<strong>' +
-        event.title +
-        '</strong><p>' +
-        event.description +
-        "</p><a href='" +
-        event.url +
-        '\'target="_blank" title="Opens in a new window">Link to the event</a>')
+      const popup = new mapboxgl.Popup().setHTML(
+        '<strong>' +
+          event.title +
+          '</strong><p>' +
+          event.description +
+          "</p><a href='" +
+          event.url +
+          '\'target="_blank" title="Opens in a new window">Link to the event</a>',
+      );
       const marker = new mapboxgl.Marker()
         .setLngLat([event.longitude, event.latitude])
         .setPopup(popup) // sets a popup on this marker
-        .addTo(this.state.map)
-      newMarkers.push(marker)
-    })
+        .addTo(this.state.map);
+      newMarkers.push(marker);
+    });
     this.setState({
-      markers: newMarkers
-    })
+      markers: newMarkers,
+    });
   }
   // putMarkers(map, events) {
   //   const gigs = [];
@@ -402,10 +414,14 @@ class Map extends React.Component {
   // }
 
   findGigs() {
-    console.log(this.props.settings)
+    console.log(this.props.settings);
     const origin = 'https://cors-anywhere.herokuapp.com/';
     let url = 'http://api.eventful.com/json/events/search?app_key=vHdXThWsm6Xn9HPP&';
-    url += '&where=' + encodeURIComponent(this.state.latitude) + ',' + encodeURIComponent(this.state.longitude);
+    url +=
+      '&where=' +
+      encodeURIComponent(this.state.latitude) +
+      ',' +
+      encodeURIComponent(this.state.longitude);
     url += '&category=music';
     url += '&within=' + encodeURIComponent(this.props.settings.range) + '&units=km';
     url += '&sort_order=date&page_size=100&date=Future';
@@ -419,12 +435,11 @@ class Map extends React.Component {
       })
       .then(data => data.json())
       .then(data => {
-        console.log(data.events)
+        console.log(data.events);
         this.props.receiveGigs(data.events.event);
         this.putMarkers(this.state.map, data.events.event);
       });
   }
-
 
   findGigsByCity(settings, byGenres) {
     if (settings.city) {
@@ -432,19 +447,19 @@ class Map extends React.Component {
         range: 250,
         date: null,
         genres: [],
-      })
+      });
       this.promises = [];
       this.props.updateLoading(true);
       this.props.receiveGigs([]);
       window
         .fetch(
-        `https://api.mapbox.com/geocoding/v5/mapbox.places/${
-        settings.city
-        }.json?access_token=pk.eyJ1IjoiYWVsaXR0YWUiLCJhIjoiY2pkdzF3bWN6MGZudjJ2b2hlN2x0ZWM2OCJ9.lM3nZt9piPiGYrpDiGAOHw&autocomplete=true&limit=1`,
-        {
-          method: 'GET',
-        },
-      )
+          `https://api.mapbox.com/geocoding/v5/mapbox.places/${
+            settings.city
+          }.json?access_token=pk.eyJ1IjoiYWVsaXR0YWUiLCJhIjoiY2pkdzF3bWN6MGZudjJ2b2hlN2x0ZWM2OCJ9.lM3nZt9piPiGYrpDiGAOHw&autocomplete=true&limit=1`,
+          {
+            method: 'GET',
+          },
+        )
         .then(data => data.json())
         .then(data => {
           this.state.map.setCenter(data.features[0].center);
@@ -453,21 +468,22 @@ class Map extends React.Component {
             latitude: data.features[0].center[1],
           });
           if (byGenres) {
-            this.findGigs()
+            this.findGigs();
           } else {
             for (const artist of this.state.artists) {
               this.promises.push(this.getArtistEvent(artist));
             }
             Promise.all(this.promises).then(this.doneReceiving);
           }
-
         });
     }
   }
 
+
   returnBack() {
 
   }
+
 
   render() {
     return (
@@ -484,7 +500,7 @@ const mapStateToProps = ({ gigs, settings, gigsByArtist, loading }) => ({
   gigs,
   settings,
   gigsByArtist,
-  loading
+  loading,
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -507,6 +523,16 @@ const mapDispatchToProps = dispatch => ({
     dispatch({
       type: actions.UPDATE_SETTINGS,
       payload: setting,
+    }),
+  setCurrentLocation: coordinates =>
+    dispatch({
+      type: actions.SET_CURRENT_LOCATION,
+      payload: coordinates,
+    }),
+  setIsGenre: isGenre =>
+    dispatch({
+      type: actiosn.SET_IS_GENRE,
+      payload: isGenre,
     }),
 });
 
