@@ -137,6 +137,7 @@ class Map extends React.Component {
     }
     console.log(sorted)
     this.props.receiveGigs(sorted);
+    this.putMarkers(this.state.map, sorted)
     console.log(this.props.gigs)
   }
 
@@ -298,6 +299,7 @@ class Map extends React.Component {
       }
     })
     this.props.receiveGigs(sorted);
+    this.putMarkers(this.state.map, sorted)
     console.log(sorted)
   }
 
