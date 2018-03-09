@@ -124,11 +124,7 @@ class Map extends React.Component {
   }
 
   filterEventsByRange(range) {
-    console.log("range" + range)
     const sorted = [];
-    console.log('empty')
-    console.log(this.props.gigs)
-    console.log(this.props.gigsByArtist)
     for (event of this.props.gigsByArtist) {
       const distance = distanceInKmBetweenEarthCoordinates(this.state.latitude, this.state.longitude, event.latitude, event.longitude);
       if (distance < range) {
@@ -138,7 +134,7 @@ class Map extends React.Component {
     }
     console.log(sorted)
     this.props.receiveGigs(sorted);
-    console.log(this.props.gigs)
+
   }
 
   resetSettings() {
@@ -172,7 +168,6 @@ class Map extends React.Component {
         data.json()
       )
       .then(data => {
-        console.log(data)
         const sortedByName = [];
         if (data.events) {
           data.events.event.map(event => {
@@ -209,8 +204,6 @@ class Map extends React.Component {
           this.props.setGigsByArtist(this.props.gigsByArtist.concat(events));
           this.props.receiveGigs(this.props.gigs.concat(sortedByName));
           this.putMarkers(this.state.map, this.props.gigs);
-          // console.log('gigs');
-          // console.log(this.props.gigs);
 
         }
       });
@@ -251,7 +244,6 @@ class Map extends React.Component {
   }
 
   getFavouriteArtists() {
-    console.log('first');
     this.promises.push(
       window
         .fetch('https://api.spotify.com/v1/me/top/artists', {
@@ -291,7 +283,6 @@ class Map extends React.Component {
 
   filterEventsByDateRange(events) {
     const sorted = [];
-    console.log(this.props.settings.date)
     const from = moment(this.props.settings.date[0], 'YYYYMMDD');
     const to = moment(this.props.settings.date[1], 'YYYYMMDD');
     events.forEach(event => {

@@ -46,7 +46,7 @@ export default class Login extends React.Component {
                         <div className='login100-form'>
                             <span className="login100-form-title p-b-34">
                                 Spotify Login
-                            <img src="./src/Spotify_logo_with_text.svg.png" />
+                            <img src="../Spotify_logo_with_text.svg.png" />
                             </span>
                             <div className="container-login100-form-btn">
                                 <button className="login100-form-btn" onClick={this.logIn}>
