@@ -6,6 +6,7 @@ import { Row, Col } from 'antd';
 import distanceInKmBetweenEarthCoordinates from '../utils/calcDistance'
 import 'lodash';
 import moment from 'moment'
+import { error } from 'util';
 
 class Map extends React.Component {
   constructor(props) {
@@ -163,7 +164,7 @@ class Map extends React.Component {
     // url+='&location='+encodeURIComponent(this.props.settings.city);
     url += '&within=250&units=km';
     return window
-      .fetch(origin + url, {
+      .fetch(url, {
         method: 'GET',
       })
       .then(data => data.json())
@@ -208,7 +209,8 @@ class Map extends React.Component {
           // console.log(this.props.gigs);
 
         }
-      });
+      })
+      .catch(error => console.error(error));
   }
 
   getRecommendatedArtists(arrayOfArtists) {
