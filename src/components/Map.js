@@ -25,7 +25,7 @@ class Map extends React.Component {
   componentWillReceiveProps(nextProps) {
     if (_.isEqual(this.props.settings, nextProps.settings) == false) {
       console.log(nextProps)
-      if (nextProps.settings.genres) {
+      if (nextProps.settings.genres && nextProps.settings.genres.length > 0) {
         this.props = nextProps;
         if (this.props.settings.city != nextProps.settings.city) {
           this.findGigsByCity(this.props.settings, true)
@@ -395,13 +395,14 @@ class Map extends React.Component {
   // }
 
   findGigs() {
+    console.log(this.props.settings)
     const origin = 'https://cors-anywhere.herokuapp.com/';
     let url = 'http://api.eventful.com/json/events/search?app_key=vHdXThWsm6Xn9HPP&';
     url += '&where=' + encodeURIComponent(this.state.latitude) + ',' + encodeURIComponent(this.state.longitude);
     url += '&category=music';
     url += '&within=' + encodeURIComponent(this.props.settings.range) + '&units=km';
-    url += '&sort_order=date&page_size=20&date=Future';
-    url += '&keywords=Jazz';
+    url += '&sort_order=date&page_size=100&date=Future';
+    url += '&keywords=' + encodeURIComponent(this.props.settings.genres);
     // for (const genre of this.props.settings.genres) {
     //   url += encodeURIComponent(genre) + ',';
     // }
