@@ -69,10 +69,10 @@ class SideMenu extends React.Component {
     })
   }
   changeCity = value => this.props.updateSettings({ city: value });
-  changeGenres = (values, Option) => {
-    console.log(values);
-    if (values) {
-      this.props.updateSettings({ genres: values });
+  changeGenres = (value) => {
+    console.log(value);
+    if (value) {
+      this.props.updateSettings({ genres: value });
     } else {
       this.props.updateSettings({ genres: null });
     }
@@ -97,11 +97,11 @@ class SideMenu extends React.Component {
       </p>
     );
 
-    const genre = ['rock', 'pop', 'techno', 'classic', 'rap', 'jazz'];
+    const genre = ['Rock', 'Pop', 'Techno', 'Classical', 'Rap', 'Jazz'];
 
     const children = [];
     for (let i = 0; i < 6; i++) {
-      children.push(<Option key={i}>{genre[i]}</Option>);
+      children.push(<Option key={i} value={genre[i]}>{genre[i]}</Option>);
     }
 
     const { settings } = this.props;
