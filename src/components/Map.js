@@ -308,8 +308,9 @@ class Map extends React.Component {
       marker.remove()
     })
     this.setState({
-      markers: []
+      markers: null
     })
+    const newMarkers = [];
     console.log(events)
     events.forEach(event => {
       const popup = new mapboxgl.Popup()
@@ -324,9 +325,10 @@ class Map extends React.Component {
         .setLngLat([event.longitude, event.latitude])
         .setPopup(popup) // sets a popup on this marker
         .addTo(this.state.map)
-      this.setState({
-        markers: this.state.markers.concat(marker)
-      })
+      newMarkers.push(marker)
+    })
+    this.setState({
+      markers: newMarkers
     })
   }
   // putMarkers(map, events) {
