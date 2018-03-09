@@ -7,6 +7,7 @@ import distanceInKmBetweenEarthCoordinates from '../utils/calcDistance'
 import 'lodash';
 import moment from 'moment'
 import { error } from 'util';
+import { Button, Icon } from 'antd';
 
 class Map extends React.Component {
   constructor(props) {
@@ -96,17 +97,17 @@ class Map extends React.Component {
     });
     // Add zoom and rotation controls to the map.
     map.addControl(new mapboxgl.NavigationControl());
-    map.addControl(
-      new mapboxgl.GeolocateControl({
-        positionOptions: {
-          enableHighAccuracy: true,
-        },
-        fitBoundsOptions: {
-          maxZoom: 14,
-        },
-        trackUserLocation: true,
-      }),
-    );
+    // map.addControl(
+    //   new mapboxgl.GeolocateControl({
+    //     positionOptions: {
+    //       enableHighAccuracy: true,
+    //     },
+    //     fitBoundsOptions: {
+    //       maxZoom: 14,
+    //     },
+    //     trackUserLocation: true,
+    //   }),
+    // );
     navigator.geolocation.getCurrentPosition(position => {
       const coords = position.coords;
       // map.flyTo( {center: [coords.longitude,coords.latitude]});
@@ -464,10 +465,18 @@ class Map extends React.Component {
     }
   }
 
-  renderMap() { }
+  returnBack() {
+
+  }
 
   render() {
-    return <div id="map" />;
+    return (
+      <div id="map">
+        <Button className='locate' onClick={this.returnBack}>
+          <i className="fa fa-location-arrow" ></i>
+        </Button>
+      </div>
+    )
   }
 }
 
