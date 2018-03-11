@@ -327,12 +327,12 @@ class Map extends React.Component {
     events.forEach(event => {
       const popup = new mapboxgl.Popup().setHTML(
         '<strong>' +
-        event.title +
-        '</strong><p>' +
-        event.description +
-        "</p><a href='" +
-        event.url +
-        '\'target="_blank" title="Opens in a new window">Link to the event</a>',
+          event.title +
+          '</strong><p>' +
+          event.description +
+          "</p><a href='" +
+          event.url +
+          '\'target="_blank" title="Opens in a new window">Link to the event</a>',
       );
       const marker = new mapboxgl.Marker()
         .setLngLat([event.longitude, event.latitude])
@@ -453,13 +453,13 @@ class Map extends React.Component {
       this.props.receiveGigs([]);
       window
         .fetch(
-        `https://api.mapbox.com/geocoding/v5/mapbox.places/${
-        settings.city
-        }.json?access_token=pk.eyJ1IjoiYWVsaXR0YWUiLCJhIjoiY2pkdzF3bWN6MGZudjJ2b2hlN2x0ZWM2OCJ9.lM3nZt9piPiGYrpDiGAOHw&autocomplete=true&limit=1`,
-        {
-          method: 'GET',
-        },
-      )
+          `https://api.mapbox.com/geocoding/v5/mapbox.places/${
+            settings.city
+          }.json?access_token=pk.eyJ1IjoiYWVsaXR0YWUiLCJhIjoiY2pkdzF3bWN6MGZudjJ2b2hlN2x0ZWM2OCJ9.lM3nZt9piPiGYrpDiGAOHw&autocomplete=true&limit=1`,
+          {
+            method: 'GET',
+          },
+        )
         .then(data => data.json())
         .then(data => {
           this.state.map.setCenter(data.features[0].center);
@@ -479,25 +479,41 @@ class Map extends React.Component {
     }
   }
 
-
   returnBack = () => {
-    this.state.map.setCenter([this.props.currentLocation.longitude, this.props.currentLocation.latitude]);
-    this.setState({
-      latitude: this.props.currentLocation.latitude,
-      longitude: this.props.currentLocation.longitude,
-    })
-    this.getFavouriteArtists();
-  }
+    this.state.map.setCenter([
+      this.props.currentLocation.longitude,
+      this.props.currentLocation.latitude,
+    ]);
+    this.setState(
+      {
+        latitude: this.props.currentLocation.latitude,
+        longitude: this.props.currentLocation.longitude,
+      },
+      () => {
+        this.props.updateSettings({
+          range: 250,
+          date: null,
+          city: null,
+          genres: [],
+        });
+        this.props.receiveGigs([]);
 
+        for (const artist of this.state.artists) {
+          this.promises.push(this.getArtistEvent(artist));
+        }
+        Promise.all(this.promises).then(this.doneReceiving);
+      },
+    );
+  };
 
   render() {
     return (
       <div id="map">
-        <Button className='locate' onClick={this.returnBack}>
-          <i className="fa fa-location-arrow" ></i>
+        <Button className="locate" onClick={this.returnBack}>
+          <i className="fa fa-location-arrow" />
         </Button>
       </div>
-    )
+    );
   }
 }
 
@@ -506,7 +522,7 @@ const mapStateToProps = ({ gigs, settings, gigsByArtist, loading, currentLocatio
   settings,
   gigsByArtist,
   loading,
-  currentLocation
+  currentLocation,
 });
 
 const mapDispatchToProps = dispatch => ({
