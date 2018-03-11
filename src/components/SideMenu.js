@@ -26,7 +26,8 @@ class SideMenu extends React.Component {
     this.state = {
       cities: arrayOfCitirs,
       sliderValue: 250,
-      dateValue: null
+      dateValue: null,
+      city: null,
     };
     this.logOut = this.logOut.bind(this);
   }
@@ -36,8 +37,9 @@ class SideMenu extends React.Component {
       this.props = nextProps;
       this.setState({
         sliderValue: 250,
-        dateValue: null
-      })
+        dateValue: null,
+        city: nextProps.settings.city,
+      });
 
     }
   }
@@ -61,16 +63,38 @@ class SideMenu extends React.Component {
       })
       this.props.updateSettings({ date: null });
     }
+  }
+
+
+  logOut() {
+    delete window.localStorage.accessToken;
+    window.location = 'http://localhost:8080/';
+  }
+
+  changeDate = moment => {
+    if (moment[0]) {
+      const from = moment[0].format('YYYYMMDD');
+      const to = moment[1].format('YYYYMMDD');
+      this.setState({
+        dateValue: moment,
+      });
+      this.props.updateSettings({ date: [from, to] });
+    } else {
+      this.setState({
+        dateValue: null,
+      });
+      this.props.updateSettings({ date: null });
+    }
 
   };
   changeRange = value => {
     this.props.updateSettings({ range: value });
     this.setState({
-      sliderValue: value
-    })
-  }
+      sliderValue: value,
+    });
+  };
   changeCity = value => this.props.updateSettings({ city: value });
-  changeGenres = (value) => {
+  changeGenres = value => {
     console.log(value);
     if (value) {
       this.props.updateSettings({ genres: value });
@@ -102,9 +126,12 @@ class SideMenu extends React.Component {
 
     const children = [];
     for (let i = 0; i < 6; i++) {
-      children.push(<Option key={i} value={genre[i]}>{genre[i]}</Option>);
+      children.push(
+        <Option key={i} value={genre[i]}>
+          {genre[i]}
+        </Option>,
+      );
     }
-
     const { settings } = this.props;
 
     return (
@@ -121,10 +148,15 @@ class SideMenu extends React.Component {
           >
             <h5>Choose date</h5>
             {/* <DatePicker onChange={this.changeDate} value={settings.date}/> */}
-            <RangePicker onChange={this.changeDate} format={dateFormat} value={this.state.dateValue} />
+
+            <RangePicker
+              onChange={this.changeDate}
+              format={dateFormat}
+              value={this.state.dateValue}
+            />
             <h5>Area range</h5>
             <Slider
-              id='slider'
+              id="slider"
               marks={marks}
               defaultValue={20}
               max={250}
@@ -136,8 +168,11 @@ class SideMenu extends React.Component {
             <h5>Change city</h5>
             <Input.Search
               style={{ width: 300 }}
+              ref={ref => (this.search = ref)}
               placeholder="input here"
+              value={this.state.city}
               onSearch={value => this.changeCity(value)}
+              onChange={e => this.setState({ city: e.target.value })}
               enterButton
             />
             <h5>Choose genres</h5>
@@ -152,7 +187,7 @@ class SideMenu extends React.Component {
             </Select>
           </Panel>
         </Collapse>
-        <div className='list'>
+        <div className="list">
           <List
             itemLayout="horizontal"
             dataSource={this.props.gigs}
