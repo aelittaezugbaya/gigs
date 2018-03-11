@@ -27,7 +27,9 @@ class App extends React.Component {
             this.state = {
                 jwt: window.localStorage.accessToken
             }
-            window.location = 'http://localhost:8080/';
+
+            window.location = 'https://users.metropolia.fi/~aelittae/gigs/';
+
         }
 
         if (window.localStorage.exp && moment().isAfter(window.localStorage.exp)) {

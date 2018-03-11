@@ -24,6 +24,7 @@ class Map extends React.Component {
   }
   promises = [];
 
+
   componentWillReceiveProps(nextProps) {
     if (_.isEqual(this.props.settings, nextProps.settings) == false) {
       console.log(nextProps);
@@ -113,6 +114,7 @@ class Map extends React.Component {
     //     trackUserLocation: true,
     //   }),
     // );
+
     navigator.geolocation.getCurrentPosition(position => {
       const coords = position.coords;
       // map.flyTo( {center: [coords.longitude,coords.latitude]});
@@ -123,6 +125,7 @@ class Map extends React.Component {
         latitude: coords.latitude,
         longitude: coords.longitude,
       });
+
       console.log(coords);
       this.props.setCurrentLocation(coords);
       //this.findGigs(this.state.latitude, this.state.longitude, this.state.map)
@@ -160,12 +163,15 @@ class Map extends React.Component {
       range: 250,
       city: null,
       genres: [],
+
     });
+
   }
 
   getArtistEvent(name) {
     const origin = 'https://cors-anywhere.herokuapp.com/';
-    let url = 'http://api.eventful.com/json/events/search?app_key=vHdXThWsm6Xn9HPP&';
+    let url = 'https://api.eventful.com/json/events/search?app_key=vHdXThWsm6Xn9HPP&';
+
     url += '&category=music&page_size=100';
     url += '&keywords=title:' + encodeURIComponent(name);
     url += '&date=Future';
@@ -182,6 +188,7 @@ class Map extends React.Component {
         method: 'GET',
       })
       .then(data => data.json())
+
       .then(data => {
         const sortedByName = [];
         if (data.events) {
@@ -224,6 +231,7 @@ class Map extends React.Component {
         }
       })
       .catch(error => console.error(error));
+
   }
 
   getRecommendatedArtists(arrayOfArtists) {
@@ -248,6 +256,7 @@ class Map extends React.Component {
           ) {
             recommendedArtists.push(track.artists[0].name);
           }
+
         });
         this.setState({
           artists: this.state.artists.concat(recommendedArtists),
@@ -546,6 +555,7 @@ const mapDispatchToProps = dispatch => ({
       type: actions.UPDATE_SETTINGS,
       payload: setting,
     }),
+
   setCurrentLocation: coordinates =>
     dispatch({
       type: actions.SET_CURRENT_LOCATION,
@@ -556,6 +566,7 @@ const mapDispatchToProps = dispatch => ({
       type: actiosn.SET_IS_GENRE,
       payload: isGenre,
     }),
+
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Map);

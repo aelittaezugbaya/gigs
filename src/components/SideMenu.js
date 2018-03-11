@@ -40,8 +40,31 @@ class SideMenu extends React.Component {
         dateValue: null,
         city: nextProps.settings.city,
       });
+
     }
   }
+
+  logOut() {
+    delete window.localStorage.accessToken;
+    window.location = 'https://users.metropolia.fi/~aelittae/gigs/';
+  }
+
+  changeDate = moment => {
+    if (moment[0]) {
+      const from = moment[0].format('YYYYMMDD');
+      const to = moment[1].format('YYYYMMDD');
+      this.setState({
+        dateValue: moment
+      })
+      this.props.updateSettings({ date: [from, to] });
+    } else {
+      this.setState({
+        dateValue: null
+      })
+      this.props.updateSettings({ date: null });
+    }
+  }
+
 
   logOut() {
     delete window.localStorage.accessToken;
@@ -62,6 +85,7 @@ class SideMenu extends React.Component {
       });
       this.props.updateSettings({ date: null });
     }
+
   };
   changeRange = value => {
     this.props.updateSettings({ range: value });
@@ -108,7 +132,6 @@ class SideMenu extends React.Component {
         </Option>,
       );
     }
-
     const { settings } = this.props;
 
     return (
@@ -125,6 +148,7 @@ class SideMenu extends React.Component {
           >
             <h5>Choose date</h5>
             {/* <DatePicker onChange={this.changeDate} value={settings.date}/> */}
+
             <RangePicker
               onChange={this.changeDate}
               format={dateFormat}
@@ -138,6 +162,7 @@ class SideMenu extends React.Component {
               max={250}
               tipFormatter={formatter}
               onChange={this.changeRange}
+
               value={this.state.sliderValue}
             />
             <h5>Change city</h5>
